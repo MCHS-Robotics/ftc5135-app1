@@ -52,14 +52,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TestAuto", group="Auto_Lin")  // @Autonomous(...) is the other common choice
-@Disabled
+@TeleOp(name="TestAuto_BY", group="Autonomous")  // @Autonomous(...) is the other common choice
+//@Disabled
 public class TestAuto_Lin extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    DcMotor leftMotor = null;
-    DcMotor rightMotor = null;
+    DcMotor left = null;
+    DcMotor right = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -70,13 +70,13 @@ public class TestAuto_Lin extends LinearOpMode {
          * to 'get' must correspond to the names assigned during the robot configuration
          * step (using the FTC Robot Controller app on the phone).
          */
-        // leftMotor  = hardwareMap.dcMotor.get("left motor");
-        // rightMotor = hardwareMap.dcMotor.get("right motor");
+        left  = hardwareMap.dcMotor.get("L");
+        right = hardwareMap.dcMotor.get("R");
 
         // eg: Set the drive motor directions:
         // "Reverse" the motor that runs backwards when connected directly to the battery
-        // leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        // rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        left.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        right.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -87,11 +87,55 @@ public class TestAuto_Lin extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
-            // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
-            // leftMotor.setPower(-gamepad1.left_stick_y);
-            // rightMotor.setPower(-gamepad1.right_stick_y);
+            forward(200, 0.5);
+            turnRight(200, 0.5);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }
+
+    private void setMotorRtP(){
+        left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    void forward(int dist, double spd){
+        setMotorRtP();
+
+        left.setTargetPosition(dist);
+        right.setTargetPosition(dist);
+        left.setPower(spd);
+        right.setPower(spd);
+    }
+
+    void backward(int dist, double spd){
+        setMotorRtP();
+
+        left.setTargetPosition(-dist);
+        right.setTargetPosition(-dist);
+        left.setPower(-spd);
+        right.setPower(-spd);
+    }
+
+    void turnLeft(int dist, double spd){
+        setMotorRtP();
+
+        left.setTargetPosition(-dist);
+        right.setTargetPosition(dist);
+        left.setPower(-spd);
+        right.setPower(spd);
+    }
+
+    void turnRight(int dist, double spd){
+        setMotorRtP();
+
+        left.setTargetPosition(dist);
+        right.setTargetPosition(-dist);
+        left.setPower(spd);
+        right.setPower(-spd);
+    }
+
 }
