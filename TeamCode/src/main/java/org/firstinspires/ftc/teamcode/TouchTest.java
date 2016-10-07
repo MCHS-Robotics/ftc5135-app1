@@ -67,13 +67,6 @@ public class TouchTest extends OpMode
     public void init() {
         telemetry.addData("Status", "Initialized");
 
-        if(ts.isPressed()){
-            dim.setLED(1, true);
-        }
-        else{
-            dim.setLED(1, false);
-        }
-
         dim = hardwareMap.deviceInterfaceModule.get("dim");
         ts = hardwareMap.touchSensor.get("touch");
 
@@ -104,6 +97,13 @@ public class TouchTest extends OpMode
 
         double force = ts.getValue();
         boolean press = ts.isPressed();
+
+        if(ts.isPressed()){
+            dim.setLED(1, true);
+        }
+        else{
+            dim.setLED(1, false);
+        }
 
         telemetry.addData("force", force);
         telemetry.addData("press", press);
