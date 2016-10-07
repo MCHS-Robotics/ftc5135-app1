@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -59,13 +60,22 @@ public class TouchTest extends OpMode
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
 
+    DeviceInterfaceModule dim = null;
     TouchSensor ts = null;
 
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
 
-        ts= hardwareMap.touchSensor.get("touch");
+        if(ts.isPressed()){
+            dim.setLED(1, true);
+        }
+        else{
+            dim.setLED(1, false);
+        }
+
+        dim = hardwareMap.deviceInterfaceModule.get("dim");
+        ts = hardwareMap.touchSensor.get("touch");
 
         telemetry.addData("Status", "Initialized");
     }
