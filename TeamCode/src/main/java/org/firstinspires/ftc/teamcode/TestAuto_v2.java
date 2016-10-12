@@ -33,9 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -53,14 +51,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="TestAuto_BY", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="TestAuto v3", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class TestAuto_Lin extends LinearOpMode {
+public class TestAuto_v2 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     DcMotor left = null;
     DcMotor right = null;
+    final double inToEnc = 360.0 / Math.PI;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -88,8 +87,8 @@ public class TestAuto_Lin extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
-            forward(200, 0.5);
-            turnRight(200, 0.5);
+            forward(48, 0.5);
+            turnRight(24, 0.5);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
@@ -111,8 +110,10 @@ public class TestAuto_Lin extends LinearOpMode {
     void forward(int dist, double spd){
         setMotorRtP();
 
-        left.setTargetPosition(dist);
-        right.setTargetPosition(dist);
+        int d = (int)(dist * inToEnc);
+
+        left.setTargetPosition(d);
+        right.setTargetPosition(d);
         left.setPower(spd);
         right.setPower(spd);
     }
@@ -120,8 +121,10 @@ public class TestAuto_Lin extends LinearOpMode {
     void backward(int dist, double spd){
         setMotorRtP();
 
-        left.setTargetPosition(-dist);
-        right.setTargetPosition(-dist);
+        int d = (int)(dist * inToEnc);
+
+        left.setTargetPosition(-d);
+        right.setTargetPosition(-d);
         left.setPower(-spd);
         right.setPower(-spd);
     }
@@ -129,8 +132,10 @@ public class TestAuto_Lin extends LinearOpMode {
     void turnLeft(int dist, double spd){
         setMotorRtP();
 
-        left.setTargetPosition(-dist);
-        right.setTargetPosition(dist);
+        int d = (int)(dist * inToEnc);
+
+        left.setTargetPosition(-d);
+        right.setTargetPosition(d);
         left.setPower(-spd);
         right.setPower(spd);
     }
@@ -138,8 +143,10 @@ public class TestAuto_Lin extends LinearOpMode {
     void turnRight(int dist, double spd){
         setMotorRtP();
 
-        left.setTargetPosition(dist);
-        right.setTargetPosition(-dist);
+        int d = (int)(dist * inToEnc);
+
+        left.setTargetPosition(d);
+        right.setTargetPosition(-d);
         left.setPower(spd);
         right.setPower(-spd);
     }
