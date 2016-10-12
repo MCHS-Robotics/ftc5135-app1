@@ -37,6 +37,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -51,15 +53,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="TestAuto v3", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto_v4", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class TestAuto_v2 extends LinearOpMode {
+public class Autonomous_caseRed extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     DcMotor left = null;
     DcMotor right = null;
     final double inToEnc = 360.0 / Math.PI;
+    final double degToEnc = 0;  //placeholder
+    Telemetry.Item leftEnc, rightEnc;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -78,6 +82,9 @@ public class TestAuto_v2 extends LinearOpMode {
         left.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         right.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
+        leftEnc = telemetry.addData("left encoder:", 0);
+        rightEnc = telemetry.addData("right encoder:", 0);
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -87,8 +94,19 @@ public class TestAuto_v2 extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
-            forward(48, 0.5);
-            turnRight(24, 0.5);
+            forward(2, 0.3);
+            turnLeft(45, 0.5);
+            forward(60, 0.7);
+            turnLeft(45, 0.5);
+            forward(3, 0.3);
+            //beacon
+            backward(3, 0.3);
+            turnRight(90, 0.5);
+            forward(48, 0.6);
+            turnLeft(90, 0.5);
+            forward(3, 0.3);
+            //beacon
+            backward(3, 0.3);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
@@ -113,6 +131,16 @@ public class TestAuto_v2 extends LinearOpMode {
         right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    private void updateEncoders()/* throws InterruptedException*/{
+        while(opModeIsActive() && left.isBusy() || right.isBusy()) {
+            leftEnc.setValue(left.getCurrentPosition());
+            rightEnc.setValue(right.getCurrentPosition());
+            telemetry.update();
+
+            //idle();
+        }
+    }
+
     /**
      * Precondition: all values >= 0
      *
@@ -130,6 +158,8 @@ public class TestAuto_v2 extends LinearOpMode {
         right.setTargetPosition(d);
         left.setPower(spd);
         right.setPower(spd);
+
+        updateEncoders();
     }
 
     /**
@@ -149,6 +179,8 @@ public class TestAuto_v2 extends LinearOpMode {
         right.setTargetPosition(-d);
         left.setPower(-spd);
         right.setPower(-spd);
+
+        updateEncoders();
     }
 
     //TODO: fix turn methods to account for rotation in degrees (or radians), not inches - will require testing
@@ -170,6 +202,8 @@ public class TestAuto_v2 extends LinearOpMode {
         right.setTargetPosition(d);
         left.setPower(-spd);
         right.setPower(spd);
+
+        updateEncoders();
     }
 
     /**
@@ -189,6 +223,8 @@ public class TestAuto_v2 extends LinearOpMode {
         right.setTargetPosition(-d);
         left.setPower(spd);
         right.setPower(-spd);
+
+        updateEncoders();
     }
 
 }
