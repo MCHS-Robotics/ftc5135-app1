@@ -53,7 +53,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto_v4", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto_v7", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous_caseRed extends LinearOpMode {
 
@@ -62,7 +62,7 @@ public class Autonomous_caseRed extends LinearOpMode {
     DcMotor left = null;
     DcMotor right = null;
     final double inToEnc = 360.0 / Math.PI;
-    final double degToEnc = 0;  //placeholder
+    final double degToEnc = 16;  //placeholder
     Telemetry.Item leftEnc, rightEnc;
 
     @Override
@@ -82,6 +82,9 @@ public class Autonomous_caseRed extends LinearOpMode {
         left.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         right.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
+        left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         leftEnc = telemetry.addData("left encoder:", 0);
         rightEnc = telemetry.addData("right encoder:", 0);
 
@@ -95,15 +98,15 @@ public class Autonomous_caseRed extends LinearOpMode {
             telemetry.update();
 
             forward(2, 0.3);
-            turnLeft(45, 0.5);
-            forward(60, 0.7);
-            turnLeft(45, 0.5);
+            turnLeft(43, 0.5);
+            forward(55, 0.7);
+            turnLeft(43, 0.5);
             forward(3, 0.3);
             //beacon
             backward(3, 0.3);
-            turnRight(90, 0.5);
-            forward(48, 0.6);
-            turnLeft(90, 0.5);
+            turnRight(87, 0.5);
+            forward(45, 0.6);
+            turnLeft(87, 0.5);
             forward(3, 0.3);
             //beacon
             backward(3, 0.3);
@@ -116,9 +119,6 @@ public class Autonomous_caseRed extends LinearOpMode {
      * Resets encoders, then changes Runmode to RUN_TO_POSITION
      */
     private void setMotorRtP(){
-        left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
@@ -127,18 +127,11 @@ public class Autonomous_caseRed extends LinearOpMode {
      * changes Runmode to RUN_USING ENCODER
      */
     private void turnOffRtP(){
+        left.setPower(0);
+        right.setPower(0);
+
         left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    private void updateEncoders()/* throws InterruptedException*/{
-        while(opModeIsActive() && left.isBusy() || right.isBusy()) {
-            leftEnc.setValue(left.getCurrentPosition());
-            rightEnc.setValue(right.getCurrentPosition());
-            telemetry.update();
-
-            //idle();
-        }
     }
 
     /**
@@ -149,17 +142,32 @@ public class Autonomous_caseRed extends LinearOpMode {
      * @param dist distance in inches
      * @param spd speed of motors, within [-1.0, 1.0]
      */
-    void forward(int dist, double spd){
-        setMotorRtP();
+    void forward(int dist, double spd) throws InterruptedException{
+        if(opModeIsActive()) {
 
-        int d = (int)(dist * inToEnc);
+            setMotorRtP();
 
-        left.setTargetPosition(d);
-        right.setTargetPosition(d);
-        left.setPower(spd);
-        right.setPower(spd);
+            int dL = left.getCurrentPosition() + (int) (dist * inToEnc);
+            int dR = right.getCurrentPosition() + (int) (dist * inToEnc);
 
-        updateEncoders();
+            left.setTargetPosition(dL);
+            right.setTargetPosition(dR);
+            left.setPower(spd);
+            right.setPower(spd);
+
+            updateEncoders();
+        }
+        turnOffRtP();
+    }
+
+    private void updateEncoders() throws InterruptedException{
+        while(opModeIsActive() && left.isBusy() || right.isBusy()) {
+            leftEnc.setValue(left.getCurrentPosition());
+            rightEnc.setValue(right.getCurrentPosition());
+            telemetry.update();
+
+            idle();
+        }
     }
 
     /**
@@ -170,17 +178,21 @@ public class Autonomous_caseRed extends LinearOpMode {
      * @param dist distance in inches
      * @param spd speed of motors, within [-1.0, 1.0]
      */
-    void backward(int dist, double spd){
-        setMotorRtP();
+    void backward(int dist, double spd) throws InterruptedException{
+        if(opModeIsActive()) {
+            setMotorRtP();
 
-        int d = (int)(dist * inToEnc);
+            int dL = left.getCurrentPosition() - (int) (dist * inToEnc);
+            int dR = right.getCurrentPosition() - (int) (dist * inToEnc);
 
-        left.setTargetPosition(-d);
-        right.setTargetPosition(-d);
-        left.setPower(-spd);
-        right.setPower(-spd);
+            left.setTargetPosition(dL);
+            right.setTargetPosition(dR);
+            left.setPower(spd);
+            right.setPower(spd);
 
-        updateEncoders();
+            updateEncoders();
+        }
+        turnOffRtP();
     }
 
     //TODO: fix turn methods to account for rotation in degrees (or radians), not inches - will require testing
@@ -193,17 +205,21 @@ public class Autonomous_caseRed extends LinearOpMode {
      * @param deg amount of degrees to turn
      * @param spd speed of turning, [-1.0, 1.0]
      */
-    void turnLeft(int deg, double spd){
-        setMotorRtP();
+    void turnLeft(int deg, double spd) throws InterruptedException{
+        if(opModeIsActive()) {
+            setMotorRtP();
 
-        int d = (int)(deg * inToEnc);
+            int dL = left.getCurrentPosition() - (int) (deg * degToEnc);
+            int dR = right.getCurrentPosition() + (int) (deg * degToEnc);
 
-        left.setTargetPosition(-d);
-        right.setTargetPosition(d);
-        left.setPower(-spd);
-        right.setPower(spd);
+            left.setTargetPosition(dL);
+            right.setTargetPosition(dR);
+            left.setPower(spd);
+            right.setPower(spd);
 
-        updateEncoders();
+            updateEncoders();
+        }
+        turnOffRtP();
     }
 
     /**
@@ -214,17 +230,21 @@ public class Autonomous_caseRed extends LinearOpMode {
      * @param deg amount of degrees to turn
      * @param spd speed of turning, [-1.0, 1.0]
      */
-    void turnRight(int deg, double spd){
-        setMotorRtP();
+    void turnRight(int deg, double spd) throws InterruptedException{
+        if(opModeIsActive()) {
+            setMotorRtP();
 
-        int d = (int)(deg * inToEnc);
+            int dL = left.getCurrentPosition() + (int) (deg * degToEnc);
+            int dR = right.getCurrentPosition() - (int) (deg * degToEnc);
 
-        left.setTargetPosition(d);
-        right.setTargetPosition(-d);
-        left.setPower(spd);
-        right.setPower(-spd);
+            left.setTargetPosition(dL);
+            right.setTargetPosition(dR);
+            left.setPower(spd);
+            right.setPower(spd);
 
-        updateEncoders();
+            updateEncoders();
+        }
+        turnOffRtP();
     }
 
 }
