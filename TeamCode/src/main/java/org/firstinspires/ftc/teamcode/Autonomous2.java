@@ -54,7 +54,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto2_v2", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto2_v3.1", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous2 extends LinearOpMode {
 
@@ -113,6 +113,8 @@ public class Autonomous2 extends LinearOpMode {
             //beacon
             backward(3, 0.3);*/
 
+            resetEnc();
+
             forward(60, 0.7);
             backward(30, 0.6);
 
@@ -129,7 +131,7 @@ public class Autonomous2 extends LinearOpMode {
      * @param spd speed of motors, within [-1.0, 1.0]
      */
     void forward(int dist, double spd) throws InterruptedException{
-        resetEnc();
+        //resetEnc();
 
         int initL = left.getCurrentPosition();
         int initR = right.getCurrentPosition();
@@ -182,7 +184,7 @@ public class Autonomous2 extends LinearOpMode {
      * @param spd speed of motors, within [-1.0, 1.0]
      */
     void backward(int dist, double spd) throws InterruptedException{
-        resetEnc();
+        //resetEnc();
 
         int initL = left.getCurrentPosition();
         int initR = right.getCurrentPosition();
