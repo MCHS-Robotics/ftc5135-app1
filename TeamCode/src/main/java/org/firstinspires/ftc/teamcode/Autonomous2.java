@@ -54,7 +54,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto2_v1.1", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto2_v2", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous2 extends LinearOpMode {
 
@@ -64,7 +64,7 @@ public class Autonomous2 extends LinearOpMode {
     DcMotor right = null;
     final double inToEnc = 360.0 / Math.PI;
     final double degToEnc = 16;  //placeholder
-    Telemetry.Item leftEnc, rightEnc;
+    Telemetry.Item leftEnc, rightEnc, leftSpd, rightSpd;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -87,6 +87,8 @@ public class Autonomous2 extends LinearOpMode {
 
         leftEnc = telemetry.addData("left encoder:", 0);
         rightEnc = telemetry.addData("right encoder:", 0);
+        leftSpd = telemetry.addData("left motor speed:", 0);
+        rightSpd = telemetry.addData("right motor speed:", 0);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -132,9 +134,9 @@ public class Autonomous2 extends LinearOpMode {
         int initR = right.getCurrentPosition();
         int targL = (int)(initL + (dist * inToEnc));
         int targR = (int)(initR + (dist * inToEnc));
-        int thresh = (int)(dist * 0.15);
+        int thresh = (int)(dist * inToEnc * 0.15);
 
-        while(opModeIsActive() && left.getCurrentPosition() < targL && right.getCurrentPosition() < targR){
+        while(opModeIsActive() && left.getCurrentPosition() <= targL && right.getCurrentPosition() <= targR){
             double currLPos = left.getCurrentPosition();
             double currRPos = right.getCurrentPosition();
 
@@ -152,6 +154,8 @@ public class Autonomous2 extends LinearOpMode {
             }
             leftEnc.setValue(currLPos);
             rightEnc.setValue(currRPos);
+            leftSpd.setValue(left.getPower());
+            rightSpd.setValue(right.getPower());
             telemetry.update();
         }
         left.setPower(0);
