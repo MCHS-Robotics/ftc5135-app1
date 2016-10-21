@@ -194,7 +194,7 @@ public class Autonomous2 extends LinearOpMode {
             double currLPos = left.getCurrentPosition();
             double currRPos = right.getCurrentPosition();
 
-            if(currLPos >= initL + thresh && currRPos >= initR + thresh){
+            if(currLPos >= initL - thresh && currRPos >= initR - thresh){
                 left.setPower(Range.scale(currLPos, initL, initL - thresh, 0.1, spd));
                 right.setPower(Range.scale(currRPos, initR, initR - thresh, 0.1, spd));
             }
