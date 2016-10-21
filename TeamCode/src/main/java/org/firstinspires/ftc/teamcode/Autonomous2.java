@@ -113,7 +113,8 @@ public class Autonomous2 extends LinearOpMode {
             //beacon
             backward(3, 0.3);*/
 
-            forward(36, 0.5);
+            forward(60, 0.7);
+            backward(30, 0.6);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
@@ -181,17 +182,38 @@ public class Autonomous2 extends LinearOpMode {
      * @param spd speed of motors, within [-1.0, 1.0]
      */
     void backward(int dist, double spd) throws InterruptedException{
-        if(opModeIsActive()) {
-            int dL = left.getCurrentPosition() - (int) (dist * inToEnc);
-            int dR = right.getCurrentPosition() - (int) (dist * inToEnc);
+        resetEnc();
 
-            left.setTargetPosition(dL);
-            right.setTargetPosition(dR);
-            left.setPower(spd);
-            right.setPower(spd);
+        int initL = left.getCurrentPosition();
+        int initR = right.getCurrentPosition();
+        int targL = (int)(initL - (dist * inToEnc));
+        int targR = (int)(initR - (dist * inToEnc));
+        int thresh = (int)(dist * inToEnc * 0.15);
 
-            updateEncoders();
+        while(opModeIsActive() && left.getCurrentPosition() >= targL && right.getCurrentPosition() >= targR){
+            double currLPos = left.getCurrentPosition();
+            double currRPos = right.getCurrentPosition();
+
+            if(currLPos >= initL + thresh && currRPos >= initR + thresh){
+                left.setPower(Range.scale(currLPos, initL, initL - thresh, 0.1, spd));
+                right.setPower(Range.scale(currRPos, initR, initR - thresh, 0.1, spd));
+            }
+            else if(currLPos < initL - thresh && currLPos > targL + thresh && currRPos < initR - thresh && currRPos > targR + thresh){
+                left.setPower(spd);
+                right.setPower(spd);
+            }
+            else{
+                left.setPower(Range.scale(currLPos, targL + thresh, targL, spd, 0));
+                right.setPower(Range.scale(currRPos, targR + thresh, targR, spd, 0));
+            }
+            leftEnc.setValue(currLPos);
+            rightEnc.setValue(currRPos);
+            leftSpd.setValue(left.getPower());
+            rightSpd.setValue(right.getPower());
+            telemetry.update();
         }
+        left.setPower(0);
+        right.setPower(0);
     }
 
     //TODO: fix turn methods to account for rotation in degrees (or radians), not inches - will require testing
