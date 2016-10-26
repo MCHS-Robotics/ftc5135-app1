@@ -53,16 +53,17 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto_v7", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto3_v1", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class Autonomous_caseRed extends LinearOpMode {
+public class Autonomous3 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     DcMotor left = null;
     DcMotor right = null;
-    final double inToEnc = 360.0 / Math.PI;
-    final double degToEnc = 16;  //placeholder
+    final double IN_TO_ENC = 360.0 / Math.PI;
+    final double DEG_TO_ENC = 16;  //placeholder
+    final double LOGISTIC_RATE = 0.0095;
     Telemetry.Item leftEnc, rightEnc;
 
     @Override
@@ -147,13 +148,17 @@ public class Autonomous_caseRed extends LinearOpMode {
 
             setMotorRtP();
 
-            int dL = left.getCurrentPosition() + (int) (dist * inToEnc);
-            int dR = right.getCurrentPosition() + (int) (dist * inToEnc);
+            int dL = left.getCurrentPosition() + (int) (dist * IN_TO_ENC);
+            int dR = right.getCurrentPosition() + (int) (dist * IN_TO_ENC);
 
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
-            left.setPower(spd);
-            right.setPower(spd);
+            left.setPower(0.1);
+            right.setPower(0.1);
+            while(left.isBusy() && right.isBusy()) {
+                left.setPower(logisticSpeed(0.1, spd, left.getCurrentPosition()));
+                right.setPower(logisticSpeed(0.1, spd, right.getCurrentPosition()));
+            }
 
             updateEncoders();
         }
@@ -182,13 +187,17 @@ public class Autonomous_caseRed extends LinearOpMode {
         if(opModeIsActive()) {
             setMotorRtP();
 
-            int dL = left.getCurrentPosition() - (int) (dist * inToEnc);
-            int dR = right.getCurrentPosition() - (int) (dist * inToEnc);
+            int dL = left.getCurrentPosition() - (int) (dist * IN_TO_ENC);
+            int dR = right.getCurrentPosition() - (int) (dist * IN_TO_ENC);
 
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
-            left.setPower(spd);
-            right.setPower(spd);
+            left.setPower(0.1);
+            right.setPower(0.1);
+            while(left.isBusy() && right.isBusy()) {
+                left.setPower(logisticSpeed(0, spd, left.getCurrentPosition()));
+                right.setPower(logisticSpeed(0, spd, right.getCurrentPosition()));
+            }
 
             updateEncoders();
         }
@@ -209,8 +218,8 @@ public class Autonomous_caseRed extends LinearOpMode {
         if(opModeIsActive()) {
             setMotorRtP();
 
-            int dL = left.getCurrentPosition() - (int) (deg * degToEnc);
-            int dR = right.getCurrentPosition() + (int) (deg * degToEnc);
+            int dL = left.getCurrentPosition() - (int) (deg * DEG_TO_ENC);
+            int dR = right.getCurrentPosition() + (int) (deg * DEG_TO_ENC);
 
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
@@ -234,8 +243,8 @@ public class Autonomous_caseRed extends LinearOpMode {
         if(opModeIsActive()) {
             setMotorRtP();
 
-            int dL = left.getCurrentPosition() + (int) (deg * degToEnc);
-            int dR = right.getCurrentPosition() - (int) (deg * degToEnc);
+            int dL = left.getCurrentPosition() + (int) (deg * DEG_TO_ENC);
+            int dR = right.getCurrentPosition() - (int) (deg * DEG_TO_ENC);
 
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
@@ -245,6 +254,10 @@ public class Autonomous_caseRed extends LinearOpMode {
             updateEncoders();
         }
         turnOffRtP();
+    }
+
+    private double logisticSpeed(double startSpd, double maxSpd, int encValue){
+        return ((startSpd * maxSpd) / (startSpd + (maxSpd - startSpd) * Math.pow(Math.E, -LOGISTIC_RATE * encValue)));
     }
 
 }

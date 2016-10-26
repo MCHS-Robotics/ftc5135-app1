@@ -36,7 +36,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -54,9 +53,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto2_v3.2", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto_v7", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class Autonomous2 extends LinearOpMode {
+public class Autonomous1 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -64,7 +63,7 @@ public class Autonomous2 extends LinearOpMode {
     DcMotor right = null;
     final double inToEnc = 360.0 / Math.PI;
     final double degToEnc = 16;  //placeholder
-    Telemetry.Item leftEnc, rightEnc, leftSpd, rightSpd;
+    Telemetry.Item leftEnc, rightEnc;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -83,12 +82,11 @@ public class Autonomous2 extends LinearOpMode {
         left.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         right.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
-        resetEnc();
+        left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftEnc = telemetry.addData("left encoder:", 0);
         rightEnc = telemetry.addData("right encoder:", 0);
-        leftSpd = telemetry.addData("left motor speed:", 0);
-        rightSpd = telemetry.addData("right motor speed:", 0);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -99,7 +97,7 @@ public class Autonomous2 extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
-            /*forward(2, 0.3);
+            forward(2, 0.3);
             turnLeft(43, 0.5);
             forward(55, 0.7);
             turnLeft(43, 0.5);
@@ -111,15 +109,29 @@ public class Autonomous2 extends LinearOpMode {
             turnLeft(87, 0.5);
             forward(3, 0.3);
             //beacon
-            backward(3, 0.3);*/
+            backward(3, 0.3);
 
-            resetEnc();
-
-            //forward(60, 0.7);
-            backward(30, 0.6);
-            //TODO: the forward and backward methods work independently of each other, but only the first runs if they're chained - fix this
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
+    }
+
+    /**
+     * Resets encoders, then changes Runmode to RUN_TO_POSITION
+     */
+    private void setMotorRtP(){
+        left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    /**
+     * changes Runmode to RUN_USING ENCODER
+     */
+    private void turnOffRtP(){
+        left.setPower(0);
+        right.setPower(0);
+
+        left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     /**
@@ -131,38 +143,21 @@ public class Autonomous2 extends LinearOpMode {
      * @param spd speed of motors, within [-1.0, 1.0]
      */
     void forward(int dist, double spd) throws InterruptedException{
-        //resetEnc();
+        if(opModeIsActive()) {
 
-        int initL = left.getCurrentPosition();
-        int initR = right.getCurrentPosition();
-        int targL = (int)(initL + (dist * inToEnc));
-        int targR = (int)(initR + (dist * inToEnc));
-        int thresh = (int)(dist * inToEnc * 0.15);
+            setMotorRtP();
 
-        while(opModeIsActive() && left.getCurrentPosition() <= targL && right.getCurrentPosition() <= targR){
-            double currLPos = left.getCurrentPosition();
-            double currRPos = right.getCurrentPosition();
+            int dL = left.getCurrentPosition() + (int) (dist * inToEnc);
+            int dR = right.getCurrentPosition() + (int) (dist * inToEnc);
 
-            if(currLPos <= initL + thresh && currRPos <= initR + thresh){
-                left.setPower(Range.scale(currLPos, initL, initL + thresh, 0.1, spd));
-                right.setPower(Range.scale(currRPos, initR, initR + thresh, 0.1, spd));
-            }
-            else if(currLPos > initL + thresh && currLPos < targL - thresh && currRPos > initR + thresh && currRPos < targR - thresh){
-                left.setPower(spd);
-                right.setPower(spd);
-            }
-            else{
-                left.setPower(Range.scale(currLPos, targL - thresh, targL, spd, 0));
-                right.setPower(Range.scale(currRPos, targR - thresh, targR, spd, 0));
-            }
-            leftEnc.setValue(currLPos);
-            rightEnc.setValue(currRPos);
-            leftSpd.setValue(left.getPower());
-            rightSpd.setValue(right.getPower());
-            telemetry.update();
+            left.setTargetPosition(dL);
+            right.setTargetPosition(dR);
+            left.setPower(spd);
+            right.setPower(spd);
+
+            updateEncoders();
         }
-        left.setPower(0);
-        right.setPower(0);
+        turnOffRtP();
     }
 
     private void updateEncoders() throws InterruptedException{
@@ -184,38 +179,20 @@ public class Autonomous2 extends LinearOpMode {
      * @param spd speed of motors, within [-1.0, 1.0]
      */
     void backward(int dist, double spd) throws InterruptedException{
-        //resetEnc();
+        if(opModeIsActive()) {
+            setMotorRtP();
 
-        int initL = left.getCurrentPosition();
-        int initR = right.getCurrentPosition();
-        int targL = (int)(initL - (dist * inToEnc));
-        int targR = (int)(initR - (dist * inToEnc));
-        int thresh = (int)(dist * inToEnc * 0.15);
+            int dL = left.getCurrentPosition() - (int) (dist * inToEnc);
+            int dR = right.getCurrentPosition() - (int) (dist * inToEnc);
 
-        while(opModeIsActive() && left.getCurrentPosition() >= targL && right.getCurrentPosition() >= targR){
-            double currLPos = left.getCurrentPosition();
-            double currRPos = right.getCurrentPosition();
+            left.setTargetPosition(dL);
+            right.setTargetPosition(dR);
+            left.setPower(spd);
+            right.setPower(spd);
 
-            if(currLPos >= initL - thresh && currRPos >= initR - thresh){
-                left.setPower(-Range.scale(currLPos, initL, initL - thresh, 0.1, spd));
-                right.setPower(-Range.scale(currRPos, initR, initR - thresh, 0.1, spd));
-            }
-            else if(currLPos < initL - thresh && currLPos > targL + thresh && currRPos < initR - thresh && currRPos > targR + thresh){
-                left.setPower(-spd);
-                right.setPower(-spd);
-            }
-            else{
-                left.setPower(-Range.scale(currLPos, targL + thresh, targL, spd, 0));
-                right.setPower(-Range.scale(currRPos, targR + thresh, targR, spd, 0));
-            }
-            leftEnc.setValue(currLPos);
-            rightEnc.setValue(currRPos);
-            leftSpd.setValue(left.getPower());
-            rightSpd.setValue(right.getPower());
-            telemetry.update();
+            updateEncoders();
         }
-        left.setPower(0);
-        right.setPower(0);
+        turnOffRtP();
     }
 
     //TODO: fix turn methods to account for rotation in degrees (or radians), not inches - will require testing
@@ -230,6 +207,8 @@ public class Autonomous2 extends LinearOpMode {
      */
     void turnLeft(int deg, double spd) throws InterruptedException{
         if(opModeIsActive()) {
+            setMotorRtP();
+
             int dL = left.getCurrentPosition() - (int) (deg * degToEnc);
             int dR = right.getCurrentPosition() + (int) (deg * degToEnc);
 
@@ -240,6 +219,7 @@ public class Autonomous2 extends LinearOpMode {
 
             updateEncoders();
         }
+        turnOffRtP();
     }
 
     /**
@@ -252,6 +232,8 @@ public class Autonomous2 extends LinearOpMode {
      */
     void turnRight(int deg, double spd) throws InterruptedException{
         if(opModeIsActive()) {
+            setMotorRtP();
+
             int dL = left.getCurrentPosition() + (int) (deg * degToEnc);
             int dR = right.getCurrentPosition() - (int) (deg * degToEnc);
 
@@ -262,13 +244,7 @@ public class Autonomous2 extends LinearOpMode {
 
             updateEncoders();
         }
+        turnOffRtP();
     }
 
-    private void resetEnc(){
-        left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
 }
