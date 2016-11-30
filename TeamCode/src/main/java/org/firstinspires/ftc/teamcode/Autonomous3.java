@@ -53,7 +53,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto3_v1", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto3_v2", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous3 extends LinearOpMode {
 
@@ -98,7 +98,7 @@ public class Autonomous3 extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
-            forward(2, 0.3);
+            /*forward(2, 0.3);
             turnLeft(43, 0.5);
             forward(55, 0.7);
             turnLeft(43, 0.5);
@@ -110,7 +110,10 @@ public class Autonomous3 extends LinearOpMode {
             turnLeft(87, 0.5);
             forward(3, 0.3);
             //beacon
-            backward(3, 0.3);
+            backward(3, 0.3);*/
+
+            forward(60, 0.7);
+            backward(36, 0.65);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
@@ -148,16 +151,29 @@ public class Autonomous3 extends LinearOpMode {
 
             setMotorRtP();
 
-            int dL = left.getCurrentPosition() + (int) (dist * IN_TO_ENC);
-            int dR = right.getCurrentPosition() + (int) (dist * IN_TO_ENC);
+            int initL = left.getCurrentPosition();
+            int initR = right.getCurrentPosition();
+            int dL = initL + (int) (dist * IN_TO_ENC);
+            int dR = initR + (int) (dist * IN_TO_ENC);
+            int thresh = (int)(dist * IN_TO_ENC * 0.15);
 
-            left.setTargetPosition(dL);
-            right.setTargetPosition(dR);
+            left.setTargetPosition(initL + dL);
+            right.setTargetPosition(initR + dR);
             left.setPower(0.1);
             right.setPower(0.1);
             while(left.isBusy() && right.isBusy()) {
-                left.setPower(logisticSpeed(0.1, spd, left.getCurrentPosition()));
-                right.setPower(logisticSpeed(0.1, spd, right.getCurrentPosition()));
+                if(left.getCurrentPosition() >= initL && left.getCurrentPosition() <= initL + thresh && right.getCurrentPosition() >= initR && right.getCurrentPosition() <= initR + thresh) {
+                    left.setPower(logisticSpeed(0.1, spd, left.getCurrentPosition(), 1));
+                    right.setPower(logisticSpeed(0.1, spd, right.getCurrentPosition(), 1));
+                }
+                else if(left.getCurrentPosition() > initL + thresh && left.getCurrentPosition() < initL + dL - thresh && right.getCurrentPosition() > initR + thresh && right.getCurrentPosition() < initR + dR - thresh){
+                    left.setPower(spd);
+                    right.setPower(spd);
+                }
+                else{
+                    left.setPower(logisticSpeed(0.1, spd, left.getCurrentPosition(), -1));
+                    right.setPower(logisticSpeed(0.1, spd, right.getCurrentPosition(), -1));
+                }
             }
 
             updateEncoders();
@@ -187,16 +203,29 @@ public class Autonomous3 extends LinearOpMode {
         if(opModeIsActive()) {
             setMotorRtP();
 
-            int dL = left.getCurrentPosition() - (int) (dist * IN_TO_ENC);
-            int dR = right.getCurrentPosition() - (int) (dist * IN_TO_ENC);
+            int initL = left.getCurrentPosition();
+            int initR = right.getCurrentPosition();
+            int dL = initL + (int) (dist * IN_TO_ENC);
+            int dR = initR + (int) (dist * IN_TO_ENC);
+            int thresh = (int)(dist * IN_TO_ENC * 0.15);
 
-            left.setTargetPosition(dL);
-            right.setTargetPosition(dR);
+            left.setTargetPosition(initL + dL);
+            right.setTargetPosition(initR + dR);
             left.setPower(0.1);
             right.setPower(0.1);
             while(left.isBusy() && right.isBusy()) {
-                left.setPower(logisticSpeed(0, spd, left.getCurrentPosition()));
-                right.setPower(logisticSpeed(0, spd, right.getCurrentPosition()));
+                if(left.getCurrentPosition() >= initL && left.getCurrentPosition() <= initL + thresh && right.getCurrentPosition() >= initR && right.getCurrentPosition() <= initR + thresh) {
+                    left.setPower(logisticSpeed(0.1, spd, left.getCurrentPosition(), 1));
+                    right.setPower(logisticSpeed(0.1, spd, right.getCurrentPosition(), 1));
+                }
+                else if(left.getCurrentPosition() > initL + thresh && left.getCurrentPosition() < initL + dL - thresh && right.getCurrentPosition() > initR + thresh && right.getCurrentPosition() < initR + dR - thresh){
+                    left.setPower(spd);
+                    right.setPower(spd);
+                }
+                else{
+                    left.setPower(logisticSpeed(0.1, spd, left.getCurrentPosition(), -1));
+                    right.setPower(logisticSpeed(0.1, spd, right.getCurrentPosition(), -1));
+                }
             }
 
             updateEncoders();
@@ -256,8 +285,16 @@ public class Autonomous3 extends LinearOpMode {
         turnOffRtP();
     }
 
-    private double logisticSpeed(double startSpd, double maxSpd, int encValue){
-        return ((startSpd * maxSpd) / (startSpd + (maxSpd - startSpd) * Math.pow(Math.E, -LOGISTIC_RATE * encValue)));
+    /**
+     *
+     * @param startSpd
+     * @param maxSpd
+     * @param encValue
+     * @param growth indicates positive or negative growth rate; precondition: growth == 1 || == -1
+     * @return
+     */
+    private double logisticSpeed(double startSpd, double maxSpd, int encValue, int growth){
+        return ((startSpd * maxSpd) / (startSpd + (maxSpd - startSpd) * Math.pow(Math.E, growth * -LOGISTIC_RATE * encValue)));
     }
 
 }

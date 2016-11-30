@@ -72,7 +72,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 @Autonomous(name = "Sensor: AdafruitRGB", group = "Sensor")
-@Disabled                            // Comment this out to add to the opmode list
+//@Disabled                            // Comment this out to add to the opmode list
 public class SensorAdafruitRGB extends LinearOpMode {
 
   ColorSensor sensorRGB;
@@ -80,7 +80,7 @@ public class SensorAdafruitRGB extends LinearOpMode {
 
   // we assume that the LED pin of the RGB sensor is connected to
   // digital port 5 (zero indexed).
-  static final int LED_CHANNEL = 5;
+  static final int LED_CHANNEL = 0;
 
   @Override
   public void runOpMode() throws InterruptedException {

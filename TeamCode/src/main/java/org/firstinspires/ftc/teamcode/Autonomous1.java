@@ -53,7 +53,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto_v7", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto1_v7", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous1 extends LinearOpMode {
 
