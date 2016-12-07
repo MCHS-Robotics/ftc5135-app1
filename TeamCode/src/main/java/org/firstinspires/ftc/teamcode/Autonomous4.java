@@ -104,7 +104,14 @@ public class Autonomous4 extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
-            forward(2, 0.3);
+            //test auto - move in a square
+            for(int i = 0; i < 4; i++){
+                forward(42, 0.7);
+                turnRight(90, 0.5);
+            }
+
+            //main auto
+            /*forward(2, 0.3);
             turnLeft(43, 0.5);
             forward(55, 0.7);
             turnLeft(43, 0.5);
@@ -116,7 +123,7 @@ public class Autonomous4 extends LinearOpMode {
             turnLeft(87, 0.5);
             forward(3, 0.3);
             //beacon
-            backward(3, 0.3);
+            backward(3, 0.3);*/
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
@@ -202,8 +209,6 @@ public class Autonomous4 extends LinearOpMode {
         turnOffRtP();
     }
 
-    //TODO: fix turn methods to account for rotation in degrees (or radians), not inches - will require testing
-
     /**
      * Precondition: all values >= 0
      *
@@ -259,7 +264,7 @@ public class Autonomous4 extends LinearOpMode {
      * Gets the red value and the blue value, and find the difference.
      * Returns positive if red, negative if blue.
      *
-     * @return red-blue the difference between the aforementioned values as scanned by the sensor
+     * @return red - blue the difference between the aforementioned values as scanned by the sensor
      */
     int scanBeacon(){
         int red = sensorRGB.red();
@@ -274,6 +279,7 @@ public class Autonomous4 extends LinearOpMode {
     void hitBeacon(){
         int bcn = scanBeacon();
         //TODO: make one version of this for team Red and one for team Blue-servo will react differently in either case
+        //also depends on sensor placement
         if(bcn > 0){
             //facing red beacon
         }
