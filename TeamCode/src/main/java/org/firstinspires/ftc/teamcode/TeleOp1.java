@@ -53,7 +53,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TestTele_BY", group="TeleOp")  // @Autonomous(...) is the other common choice
+@TeleOp(name="TeleOp v1.2", group="TeleOp")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class TeleOp1 extends OpMode
 {
@@ -88,7 +88,7 @@ public class TeleOp1 extends OpMode
         shootB = hardwareMap.dcMotor.get("B");
 
         bacon = hardwareMap.servo.get("bcn");
-        midPos = bacon.getPosition();
+        midPos = 0.5; //bacon.getPosition();
 
         // eg: Set the drive motor directions:
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -123,7 +123,7 @@ public class TeleOp1 extends OpMode
         telemetry.addData("Status", "Running: " + runtime.toString());
 
         //tank drive
-        left.setPower(gamepad1.left_stick_y);
+        left.setPower(-gamepad1.left_stick_y);
         right.setPower(gamepad1.right_stick_y);
 
         //shooter--press buttons for speed multiplier
