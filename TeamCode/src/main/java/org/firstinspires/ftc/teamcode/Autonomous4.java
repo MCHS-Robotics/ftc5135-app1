@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -55,7 +56,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto4", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto v5", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous4 extends LinearOpMode {
 
@@ -68,6 +69,9 @@ public class Autonomous4 extends LinearOpMode {
     Telemetry.Item leftEnc, rightEnc;
     ColorSensor sensorRGB;
     DeviceInterfaceModule cdim;
+    private Servo bacon = null;
+    private double midPos = 0.5;
+    private final boolean TEAM = true;  //true=red team, false = blue team
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -94,6 +98,9 @@ public class Autonomous4 extends LinearOpMode {
 
         cdim = hardwareMap.deviceInterfaceModule.get("dim");
         sensorRGB = hardwareMap.colorSensor.get("color");
+
+        bacon = hardwareMap.servo.get("bcn");
+        bacon.setPosition(midPos);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -277,14 +284,23 @@ public class Autonomous4 extends LinearOpMode {
      * Operates the beacon-hitting arm
      */
     void hitBeacon(){
-        int bcn = scanBeacon();
+        bacon.setPosition(midPos);
+        int bcnCol = scanBeacon();
         //TODO: make one version of this for team Red and one for team Blue-servo will react differently in either case
         //also depends on sensor placement
-        if(bcn > 0){
+        if(bcnCol > 0){
             //facing red beacon
+            if(TEAM)    //if red team
+                bacon.setPosition(0.7);//check this position; swing right
+            else    //if blue team
+                bacon.setPosition(0.3);//swing left
         }
         else{
             //facing blue beacon
+            if(TEAM)    //if red team:
+                bacon.setPosition(0.3);//check this position
+            else    //if blue team:
+                bacon.setPosition(0.7);
         }
     }
 

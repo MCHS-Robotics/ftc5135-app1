@@ -34,7 +34,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -53,7 +55,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp v1.2", group="TeleOp")  // @Autonomous(...) is the other common choice
+@TeleOp(name="TeleOp v1.3.0", group="TeleOp")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class TeleOp1 extends OpMode
 {
@@ -68,6 +70,13 @@ public class TeleOp1 extends OpMode
 
     private Servo bacon = null;
     private double midPos = 0;
+
+    ColorSensor sensorRGB;
+    DeviceInterfaceModule cdim;
+
+    private final boolean TEAM = true;  //true=red team, false = blue team
+
+
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -89,6 +98,9 @@ public class TeleOp1 extends OpMode
 
         bacon = hardwareMap.servo.get("bcn");
         midPos = 0.5; //bacon.getPosition();
+
+        cdim = hardwareMap.deviceInterfaceModule.get("dim");
+        sensorRGB = hardwareMap.colorSensor.get("color");
 
         // eg: Set the drive motor directions:
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -151,8 +163,9 @@ public class TeleOp1 extends OpMode
         }
         else if(gamepad2.dpad_down){
             if(gamepad2.a){
-                shootA.setPower(-0.625);
-                shootB.setPower(-0.625);
+                //special slowing modifier, not speed up
+                shootA.setPower(-0.3);
+                shootB.setPower(-0.3);
             }
             else if(gamepad2.b){
                 shootA.setPower(-0.75);
@@ -186,6 +199,10 @@ public class TeleOp1 extends OpMode
         else{
             bacon.setPosition(midPos);
         }
+
+        //test for the autonomous beacon hitter
+        if(gamepad2.right_bumper)
+            hitBeacon();
     }
 
     /*
@@ -195,6 +212,44 @@ public class TeleOp1 extends OpMode
     public void stop() {
         left.setPower(0);
         right.setPower(0);
+    }
+
+    /**
+     * Checks the color of the half of the beacon that the Adafruit RGB Sensor is facing.
+     * Gets the red value and the blue value, and find the difference.
+     * Returns positive if red, negative if blue.
+     *
+     * @return red - blue the difference between the aforementioned values as scanned by the sensor
+     */
+    int scanBeacon(){
+        int red = sensorRGB.red();
+        int blue = sensorRGB.blue();
+
+        return red - blue;
+    }
+
+    /**
+     * Operates the beacon-hitting arm
+     */
+    void hitBeacon(){
+        bacon.setPosition(midPos);
+        int bcnCol = scanBeacon();
+        //TODO: make one version of this for team Red and one for team Blue-servo will react differently in either case
+        //also depends on sensor placement
+        if(bcnCol > 0){
+            //facing red beacon
+            if(TEAM)    //if red team
+                bacon.setPosition(0.7);//check this position; swing right
+            else    //if blue team
+                bacon.setPosition(0.3);//swing left
+        }
+        else{
+            //facing blue beacon
+            if(TEAM)    //if red team:
+                bacon.setPosition(0.3);//check this position
+            else    //if blue team:
+                bacon.setPosition(0.7);
+        }
     }
 
 }
