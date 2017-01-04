@@ -56,7 +56,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto v6.0.0 B", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto v6.1.0 B", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous5 extends LinearOpMode {
 
@@ -66,13 +66,13 @@ public class Autonomous5 extends LinearOpMode {
     DcMotor right = null;
     private DcMotor shootA = null;
     private DcMotor shootB = null;
-    final double inToEnc = 360.0 / Math.PI;
-    final double degToEnc = 16;  //placeholder
+    final double IN_TO_ENC = 360.0 / Math.PI;
+    final double DEG_TO_ENC = 16;  //placeholder
     Telemetry.Item leftEnc, rightEnc;
     ElapsedTime et = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    ColorSensor sensorRGB;
-    DeviceInterfaceModule cdim;
-    private Servo bacon = null;
+    //ColorSensor sensorRGB;
+    //DeviceInterfaceModule cdim;
+    //private Servo bacon = null;
     private double midPos = 0.5;
     private final boolean TEAM = true;  //true=red team, false = blue team
 
@@ -101,11 +101,11 @@ public class Autonomous5 extends LinearOpMode {
         leftEnc = telemetry.addData("left encoder:", 0);
         rightEnc = telemetry.addData("right encoder:", 0);
 
-        cdim = hardwareMap.deviceInterfaceModule.get("dim");
-        sensorRGB = hardwareMap.colorSensor.get("color");
+        //cdim = hardwareMap.deviceInterfaceModule.get("dim");
+        //sensorRGB = hardwareMap.colorSensor.get("color");
 
-        bacon = hardwareMap.servo.get("bcn");
-        bacon.setPosition(midPos);
+        //bacon = hardwareMap.servo.get("bcn");
+        //bacon.setPosition(midPos);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -186,8 +186,8 @@ public class Autonomous5 extends LinearOpMode {
 
             setMotorRtP();
 
-            int dL = left.getCurrentPosition() + (int) (dist * inToEnc);
-            int dR = right.getCurrentPosition() + (int) (dist * inToEnc);
+            int dL = left.getCurrentPosition() + (int) (dist * IN_TO_ENC);
+            int dR = right.getCurrentPosition() + (int) (dist * IN_TO_ENC);
 
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
@@ -221,8 +221,8 @@ public class Autonomous5 extends LinearOpMode {
         if(opModeIsActive()) {
             setMotorRtP();
 
-            int dL = left.getCurrentPosition() - (int) (dist * inToEnc);
-            int dR = right.getCurrentPosition() - (int) (dist * inToEnc);
+            int dL = left.getCurrentPosition() - (int) (dist * IN_TO_ENC);
+            int dR = right.getCurrentPosition() - (int) (dist * IN_TO_ENC);
 
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
@@ -246,8 +246,8 @@ public class Autonomous5 extends LinearOpMode {
         if(opModeIsActive()) {
             setMotorRtP();
 
-            int dL = left.getCurrentPosition() - (int) (deg * degToEnc);
-            int dR = right.getCurrentPosition() + (int) (deg * degToEnc);
+            int dL = left.getCurrentPosition() - (int) (deg * DEG_TO_ENC);
+            int dR = right.getCurrentPosition() + (int) (deg * DEG_TO_ENC);
 
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
@@ -271,8 +271,8 @@ public class Autonomous5 extends LinearOpMode {
         if(opModeIsActive()) {
             setMotorRtP();
 
-            int dL = left.getCurrentPosition() + (int) (deg * degToEnc);
-            int dR = right.getCurrentPosition() - (int) (deg * degToEnc);
+            int dL = left.getCurrentPosition() + (int) (deg * DEG_TO_ENC);
+            int dR = right.getCurrentPosition() - (int) (deg * DEG_TO_ENC);
 
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
@@ -291,17 +291,17 @@ public class Autonomous5 extends LinearOpMode {
      *
      * @return red - blue the difference between the aforementioned values as scanned by the sensor
      */
-    int scanBeacon(){
+    /*int scanBeacon(){
         int red = sensorRGB.red();
         int blue = sensorRGB.blue();
 
         return red - blue;
-    }
+    }*/
 
     /**
      * Operates the beacon-hitting arm
      */
-    void hitBeacon(){
+   /* void hitBeacon(){
         bacon.setPosition(midPos);
         int bcnCol = scanBeacon();
         //TODO: make one version of this for team Red and one for team Blue-servo will react differently in either case
@@ -320,7 +320,7 @@ public class Autonomous5 extends LinearOpMode {
             else    //if blue team:
                 bacon.setPosition(0.7);
         }
-    }
+    }*/
 
     /**
      * Operates the ball shooter
