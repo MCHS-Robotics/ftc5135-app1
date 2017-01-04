@@ -41,6 +41,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import static java.lang.Thread.sleep;
+
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -55,7 +57,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp v1.3.0", group="TeleOp")  // @Autonomous(...) is the other common choice
+@TeleOp(name="TeleOp v1.4.4", group="TeleOp")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class TeleOp1 extends OpMode
 {
@@ -131,12 +133,12 @@ public class TeleOp1 extends OpMode
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
     @Override
-    public void loop() {
+    public void loop(){
         telemetry.addData("Status", "Running: " + runtime.toString());
 
         //tank drive
-        left.setPower(-gamepad1.left_stick_y);
-        right.setPower(gamepad1.right_stick_y);
+        left.setPower(Range.clip(-gamepad1.left_stick_y+gamepad1.right_stick_x, -1, 1));
+        right.setPower(Range.clip(gamepad1.left_stick_y+gamepad1.right_stick_x, -1, 1));
 
         //shooter--press buttons for speed multiplier
         if(gamepad2.dpad_up){
@@ -189,6 +191,10 @@ public class TeleOp1 extends OpMode
             shootB.setPower(0);
         }
 
+        //test for the autonomous beacon hitter
+        /*if(gamepad2.right_bumper)
+            hitBeacon();*/
+
         //beacon manipulator--R/L triggers
         if(gamepad2.right_trigger > 0){
             bacon.setPosition(Range.scale(gamepad2.right_trigger, 0, 1, midPos, 1));
@@ -200,9 +206,7 @@ public class TeleOp1 extends OpMode
             bacon.setPosition(midPos);
         }
 
-        //test for the autonomous beacon hitter
-        if(gamepad2.right_bumper)
-            hitBeacon();
+
     }
 
     /*
@@ -231,24 +235,28 @@ public class TeleOp1 extends OpMode
     /**
      * Operates the beacon-hitting arm
      */
-    void hitBeacon(){
+    void hitBeacon(){ //throws InterruptedException{
         bacon.setPosition(midPos);
         int bcnCol = scanBeacon();
         //TODO: make one version of this for team Red and one for team Blue-servo will react differently in either case
         //also depends on sensor placement
         if(bcnCol > 0){
             //facing red beacon
-            if(TEAM)    //if red team
-                bacon.setPosition(0.7);//check this position; swing right
-            else    //if blue team
-                bacon.setPosition(0.3);//swing left
+            if(TEAM) {  //if red team
+                bacon.setPosition(0.9);//check this position; swing right
+            }
+            else {    //if blue team
+                bacon.setPosition(0.1);//swing left
+            }
+            //wait(1000);
         }
         else{
             //facing blue beacon
             if(TEAM)    //if red team:
-                bacon.setPosition(0.3);//check this position
+                bacon.setPosition(0.1);//check this position
             else    //if blue team:
-                bacon.setPosition(0.7);
+                bacon.setPosition(0.9);
+            //wait(1000);
         }
     }
 

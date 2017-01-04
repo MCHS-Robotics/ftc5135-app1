@@ -56,9 +56,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto v6.0.0 A", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto v6.0.0 B", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class Autonomous4 extends LinearOpMode {
+public class Autonomous5 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -137,18 +137,18 @@ public class Autonomous4 extends LinearOpMode {
             //beacon
             backward(3, 0.3);*/
 
-            //cap ball, park mid
-            //forward(74, 0.3);
+            //cap ball, park mid in a diagonal
+            forward(100, 0.3);
 
             //red close to vortex, partial park on corner
-            forward(14, 0.5);
+            /*forward(14, 0.5);
             turnLeft(43, 0.35);
             forward(18, 0.5);
             turnLeft(87, 0.35);
             forward(5, 0.6);
             shootBall(1.0);
             turnLeft(180, 0.3);
-            forward(7, 0.55);
+            forward(7, 0.55);*/
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
