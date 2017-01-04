@@ -57,7 +57,7 @@ import static java.lang.Thread.sleep;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp v1.4.4", group="TeleOp")  // @Autonomous(...) is the other common choice
+@TeleOp(name="TeleOp v1.5.0", group="TeleOp")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class TeleOp1 extends OpMode
 {
@@ -70,11 +70,11 @@ public class TeleOp1 extends OpMode
     private DcMotor shootA = null;
     private DcMotor shootB = null;
 
-    private Servo bacon = null;
+    //private Servo bacon = null;
     private double midPos = 0;
 
-    ColorSensor sensorRGB;
-    DeviceInterfaceModule cdim;
+    //ColorSensor sensorRGB;
+    //DeviceInterfaceModule cdim;
 
     private final boolean TEAM = true;  //true=red team, false = blue team
 
@@ -98,11 +98,11 @@ public class TeleOp1 extends OpMode
         shootA = hardwareMap.dcMotor.get("A");
         shootB = hardwareMap.dcMotor.get("B");
 
-        bacon = hardwareMap.servo.get("bcn");
+        //bacon = hardwareMap.servo.get("bcn");
         midPos = 0.5; //bacon.getPosition();
 
-        cdim = hardwareMap.deviceInterfaceModule.get("dim");
-        sensorRGB = hardwareMap.colorSensor.get("color");
+        //cdim = hardwareMap.deviceInterfaceModule.get("dim");
+        //sensorRGB = hardwareMap.colorSensor.get("color");
 
         // eg: Set the drive motor directions:
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -196,7 +196,7 @@ public class TeleOp1 extends OpMode
             hitBeacon();*/
 
         //beacon manipulator--R/L triggers
-        if(gamepad2.right_trigger > 0){
+        /*if(gamepad2.right_trigger > 0){
             bacon.setPosition(Range.scale(gamepad2.right_trigger, 0, 1, midPos, 1));
         }
         else if(gamepad2.left_trigger > 0){
@@ -204,7 +204,7 @@ public class TeleOp1 extends OpMode
         }
         else{
             bacon.setPosition(midPos);
-        }
+        }*/
 
 
     }
@@ -225,17 +225,17 @@ public class TeleOp1 extends OpMode
      *
      * @return red - blue the difference between the aforementioned values as scanned by the sensor
      */
-    int scanBeacon(){
+    /*int scanBeacon(){
         int red = sensorRGB.red();
         int blue = sensorRGB.blue();
 
         return red - blue;
-    }
+    }*/
 
     /**
      * Operates the beacon-hitting arm
      */
-    void hitBeacon(){ //throws InterruptedException{
+   /* void hitBeacon(){ //throws InterruptedException{
         bacon.setPosition(midPos);
         int bcnCol = scanBeacon();
         //TODO: make one version of this for team Red and one for team Blue-servo will react differently in either case
@@ -258,6 +258,6 @@ public class TeleOp1 extends OpMode
                 bacon.setPosition(0.9);
             //wait(1000);
         }
-    }
+    }*/
 
 }
