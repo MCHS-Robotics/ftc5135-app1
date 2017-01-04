@@ -57,7 +57,7 @@ import static java.lang.Thread.sleep;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp v1.5.0", group="TeleOp")  // @Autonomous(...) is the other common choice
+@TeleOp(name="TeleOp v1.5.1", group="TeleOp")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class TeleOp1 extends OpMode
 {
@@ -109,8 +109,8 @@ public class TeleOp1 extends OpMode
         left.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         right.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
-        shootA.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        shootB.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        shootA.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+        shootB.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
         telemetry.addData("Status", "Initialized");
     }
 
@@ -137,8 +137,8 @@ public class TeleOp1 extends OpMode
         telemetry.addData("Status", "Running: " + runtime.toString());
 
         //tank drive
-        left.setPower(Range.clip(-gamepad1.left_stick_y+gamepad1.right_stick_x, -1, 1));
-        right.setPower(Range.clip(gamepad1.left_stick_y+gamepad1.right_stick_x, -1, 1));
+        left.setPower(Range.clip(gamepad1.left_stick_y+gamepad1.right_stick_x, -1, 1));
+        right.setPower(Range.clip(gamepad1.left_stick_y-gamepad1.right_stick_x, -1, 1));
 
         //shooter--press buttons for speed multiplier
         if(gamepad2.dpad_up){

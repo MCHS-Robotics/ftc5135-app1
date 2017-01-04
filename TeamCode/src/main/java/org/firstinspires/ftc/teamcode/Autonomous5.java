@@ -138,7 +138,7 @@ public class Autonomous5 extends LinearOpMode {
             backward(3, 0.3);*/
 
             //cap ball, park mid in a diagonal
-            forward(100, 0.3);
+            forward(24, 0.3);
 
             //red close to vortex, partial park on corner
             /*forward(14, 0.5);
@@ -309,7 +309,8 @@ public class Autonomous5 extends LinearOpMode {
         if(bcnCol > 0){
             //facing red beacon
             if(TEAM)    //if red team
-                bacon.setPosition(0.7);//check this position; swing right
+                //bacon.setPosition(0.7);//check this position; swing right
+                //TODO: add new method to hit beacon with the sponge arm - run only one side of wheels for a tiny bit
             else    //if blue team
                 bacon.setPosition(0.3);//swing left
         }
