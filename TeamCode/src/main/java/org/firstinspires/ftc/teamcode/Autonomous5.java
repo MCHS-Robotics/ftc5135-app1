@@ -56,7 +56,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto v6.1.0 B", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto v6.2.0 B", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous5 extends LinearOpMode {
 
@@ -98,8 +98,9 @@ public class Autonomous5 extends LinearOpMode {
         left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftEnc = telemetry.addData("left encoder:", 0);
-        rightEnc = telemetry.addData("right encoder:", 0);
+        /*leftEnc = */telemetry.addData("left encoder:", 0);
+        /*rightEnc =*/ telemetry.addData("right encoder:", 0);
+        telemetry.update();
 
         //cdim = hardwareMap.deviceInterfaceModule.get("dim");
         //sensorRGB = hardwareMap.colorSensor.get("color");
@@ -181,7 +182,7 @@ public class Autonomous5 extends LinearOpMode {
      * @param dist distance in inches
      * @param spd speed of motors, within [-1.0, 1.0]
      */
-    void backward(int dist, double spd) throws InterruptedException{
+    void forward(int dist, double spd) throws InterruptedException{
         if(opModeIsActive()) {
 
             setMotorRtP();
@@ -195,14 +196,16 @@ public class Autonomous5 extends LinearOpMode {
             right.setPower(spd);
 
             updateEncoders();
+
+            turnOffRtP();
         }
-        turnOffRtP();
     }
 
     private void updateEncoders() throws InterruptedException{
-        while(opModeIsActive() && left.isBusy() || right.isBusy()) {
-            leftEnc.setValue(left.getCurrentPosition());
-            rightEnc.setValue(right.getCurrentPosition());
+        telemetry.clearAll();
+        while(opModeIsActive() && left.isBusy() && right.isBusy()) {
+            telemetry.addData("L Encoder: ", left.getCurrentPosition());
+            telemetry.addData("R Encoder: ", right.getCurrentPosition());
             telemetry.update();
 
             idle();
@@ -217,7 +220,7 @@ public class Autonomous5 extends LinearOpMode {
      * @param dist distance in inches
      * @param spd speed of motors, within [-1.0, 1.0]
      */
-    void forward(int dist, double spd) throws InterruptedException{
+    void backwards(int dist, double spd) throws InterruptedException{
         if(opModeIsActive()) {
             setMotorRtP();
 
@@ -242,7 +245,7 @@ public class Autonomous5 extends LinearOpMode {
      * @param deg amount of degrees to turn
      * @param spd speed of turning, [-1.0, 1.0]
      */
-    void turnRight(int deg, double spd) throws InterruptedException{
+    void turnLeft(int deg, double spd) throws InterruptedException{
         if(opModeIsActive()) {
             setMotorRtP();
 
@@ -267,7 +270,7 @@ public class Autonomous5 extends LinearOpMode {
      * @param deg amount of degrees to turn
      * @param spd speed of turning, [-1.0, 1.0]
      */
-    void turnLeft(int deg, double spd) throws InterruptedException{
+    void turnRight(int deg, double spd) throws InterruptedException{
         if(opModeIsActive()) {
             setMotorRtP();
 
