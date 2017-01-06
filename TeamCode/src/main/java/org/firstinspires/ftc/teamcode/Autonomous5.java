@@ -140,6 +140,7 @@ public class Autonomous5 extends LinearOpMode {
 
             //cap ball, park mid in a diagonal
             forward(24, 0.3);
+            turnRight(30, 0.3);
 
             //red close to vortex, partial park on corner
             /*forward(14, 0.5);
@@ -205,8 +206,8 @@ public class Autonomous5 extends LinearOpMode {
     private void updateEncoders() throws InterruptedException{
         telemetry.clearAll();
         while(opModeIsActive() && (left.isBusy() && right.isBusy())) {  //should this be L&&R or L||R?
-            telemetry.addData("Target Positions", "L: %7f  R: %7f", left.getTargetPosition(), right.getTargetPosition());
-            telemetry.addData("Current Position", "L: %7f  R: %7f", left.getCurrentPosition(), right.getCurrentPosition());
+            telemetry.addData("Target Positions", "L: %d  R: %d", left.getTargetPosition(), right.getTargetPosition());
+            telemetry.addData("Current Position", "L: %d  R: %d", left.getCurrentPosition(), right.getCurrentPosition());
             telemetry.addData("Motor Power", "L: %7f  R: %7f", left.getPower(), right.getPower());
             telemetry.update();
 
