@@ -56,7 +56,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto v6.2.0 B", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto v6.3.1 B", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous5 extends LinearOpMode {
 
@@ -205,9 +205,9 @@ public class Autonomous5 extends LinearOpMode {
     private void updateEncoders() throws InterruptedException{
         telemetry.clearAll();
         while(opModeIsActive() && (left.isBusy() && right.isBusy())) {  //should this be L&&R or L||R?
-            telemetry.addData("Target Positions", "L: %7d  R: %7d", left.getTargetPosition(), right.getTargetPosition());
-            telemetry.addData("Current Position", "L: %7d  R: %7d", left.getCurrentPosition(), right.getCurrentPosition());
-            telemetry.addData("Motor Power", "L: %7d  R: %7d", left.getPower(), right.getPower());
+            telemetry.addData("Target Positions", "L: %7f  R: %7f", left.getTargetPosition(), right.getTargetPosition());
+            telemetry.addData("Current Position", "L: %7f  R: %7f", left.getCurrentPosition(), right.getCurrentPosition());
+            telemetry.addData("Motor Power", "L: %7f  R: %7f", left.getPower(), right.getPower());
             telemetry.update();
 
             idle();
