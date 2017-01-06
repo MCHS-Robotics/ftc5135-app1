@@ -68,7 +68,7 @@ public class Autonomous5 extends LinearOpMode {
     private DcMotor shootB = null;
     final double IN_TO_ENC = 360.0 / Math.PI;
     final double DEG_TO_ENC = 16;  //placeholder
-    Telemetry.Item leftEnc, rightEnc;
+    //Telemetry.Item leftEnc, rightEnc;
     ElapsedTime et = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     //ColorSensor sensorRGB;
     //DeviceInterfaceModule cdim;
@@ -185,13 +185,14 @@ public class Autonomous5 extends LinearOpMode {
     void forward(int dist, double spd) throws InterruptedException{
         if(opModeIsActive()) {
 
-            setMotorRtP();
-
             int dL = left.getCurrentPosition() + (int) (dist * IN_TO_ENC);
             int dR = right.getCurrentPosition() + (int) (dist * IN_TO_ENC);
 
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
+
+            setMotorRtP();
+
             left.setPower(spd);
             right.setPower(spd);
 
@@ -203,9 +204,10 @@ public class Autonomous5 extends LinearOpMode {
 
     private void updateEncoders() throws InterruptedException{
         telemetry.clearAll();
-        while(opModeIsActive() && left.isBusy() && right.isBusy()) {
-            telemetry.addData("L Encoder: ", left.getCurrentPosition());
-            telemetry.addData("R Encoder: ", right.getCurrentPosition());
+        while(opModeIsActive() && (left.isBusy() && right.isBusy())) {  //should this be L&&R or L||R?
+            telemetry.addData("Target Positions", "L: %7d  R: %7d", left.getTargetPosition(), right.getTargetPosition());
+            telemetry.addData("Current Position", "L: %7d  R: %7d", left.getCurrentPosition(), right.getCurrentPosition());
+            telemetry.addData("Motor Power", "L: %7d  R: %7d", left.getPower(), right.getPower());
             telemetry.update();
 
             idle();
