@@ -34,13 +34,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
 /**
@@ -56,9 +51,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto v6.4.4 B", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto v6.5.0 C", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class Autonomous5 extends LinearOpMode {
+public class Autonomous6 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -72,8 +67,8 @@ public class Autonomous5 extends LinearOpMode {
     ElapsedTime et = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     //ColorSensor sensorRGB;
     //DeviceInterfaceModule cdim;
-    private Servo bacon = null;
-    private double midPos = 0.5;    //because it's a CR Servo this value should be the "0 power" position
+    //private Servo bacon = null;
+    private double midPos = 0.5;
     private final boolean TEAM = true;  //true=red team, false = blue team
 
     @Override
@@ -105,70 +100,28 @@ public class Autonomous5 extends LinearOpMode {
         //cdim = hardwareMap.deviceInterfaceModule.get("dim");
         //sensorRGB = hardwareMap.colorSensor.get("color");
 
-        bacon = hardwareMap.servo.get("bcn");
-        bacon.setPosition(midPos);
+        //bacon = hardwareMap.servo.get("bcn");
+        //bacon.setPosition(midPos);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
+        //go forward based on time
+        left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //sleep(10000);
+        //either this or just a simple "sleep"
         double sTime = runtime.time();
-
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
-
-            //test auto - move in a square
-            /*for(int i = 0; i < 4; i++){
-                forward(42, 0.7);
-                turnRight(90, 0.5);
-            }*/
-
-            //main auto
-            /*forward(2, 0.3);
-            turnLeft(43, 0.5);
-            forward(55, 0.7);
-            turnLeft(43, 0.5);
-            forward(3, 0.3);
-            //beacon
-            backward(3, 0.3);
-            turnRight(87, 0.5);
-            forward(45, 0.6);
-            turnLeft(87, 0.5);
-            forward(3, 0.3);
-            //beacon
-            backward(3, 0.3);*/
-
-            //cap ball, park mid in a diagonal
-            //forward(24, 0.3);
-            //turnRight(30, 0.3);
-
-            //red close to vortex, partial park on corner
-            /*forward(14, 0.5);
-            turnLeft(43, 0.35);
-            forward(18, 0.5);
-            turnLeft(87, 0.35);
-            forward(5, 0.6);
-            shootBall(1.0);
-            turnLeft(180, 0.3);
-            forward(7, 0.55);*/
-
-            //go forward based on time
-            left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            //sleep(10000);
-            //either this or just a simple "sleep"
-
-            while(runtime.time() < sTime + 10){
-                left.setPower(0);
-                right.setPower(0);
-            }
-            if(runtime.time() < sTime + 13)
-                timedForward(3000);
-
-            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+        while(runtime.time() < sTime + 10){
+            left.setPower(0);
+            right.setPower(0);
         }
+        if(runtime.time() < sTime + 13)
+            timedForward(0.4, 3000);
+
+        idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+
     }
 
     /**
@@ -230,13 +183,13 @@ public class Autonomous5 extends LinearOpMode {
         }
     }
 
-    void timedForward(double ms) throws InterruptedException{
+    void timedForward(double spd, double ms) throws InterruptedException{
         et.reset();
         double startTime = et.time();
         double endTime = startTime + ms;
         while(et.time() < endTime){
-            left.setPower(0.4);
-            right.setPower(0.4);
+            left.setPower(spd);
+            right.setPower(spd);
             //idle();
         }
         left.setPower(0);
@@ -268,6 +221,19 @@ public class Autonomous5 extends LinearOpMode {
         turnOffRtP();
     }
 
+    void timedBackwards(double spd, double ms){
+        et.reset();
+        double startTime = et.time();
+        double endTime = startTime + ms;
+        while(et.time() < endTime){
+            left.setPower(-spd);
+            right.setPower(-spd);
+            //idle();
+        }
+        left.setPower(0);
+        right.setPower(0);
+    }
+
     /**
      * Precondition: all values >= 0
      *
@@ -293,6 +259,19 @@ public class Autonomous5 extends LinearOpMode {
         turnOffRtP();
     }
 
+    void timedLeft(double spd, double ms){
+        et.reset();
+        double startTime = et.time();
+        double endTime = startTime + ms;
+        while(et.time() < endTime){
+            left.setPower(-spd);
+            right.setPower(spd);
+            //idle();
+        }
+        left.setPower(0);
+        right.setPower(0);
+    }
+
     /**
      * Precondition: all values >= 0
      *
@@ -316,6 +295,19 @@ public class Autonomous5 extends LinearOpMode {
             updateEncoders();
         }
         turnOffRtP();
+    }
+
+    void timedRight(double spd, double ms){
+        et.reset();
+        double startTime = et.time();
+        double endTime = startTime + ms;
+        while(et.time() < endTime){
+            left.setPower(spd);
+            right.setPower(-spd);
+            //idle();
+        }
+        left.setPower(0);
+        right.setPower(0);
     }
 
     /**

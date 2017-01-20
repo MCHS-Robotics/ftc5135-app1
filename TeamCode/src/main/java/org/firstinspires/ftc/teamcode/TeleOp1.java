@@ -57,7 +57,7 @@ import static java.lang.Thread.sleep;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp v1.5.1", group="TeleOp")  // @Autonomous(...) is the other common choice
+@TeleOp(name="TeleOp v1.6.0", group="TeleOp")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class TeleOp1 extends OpMode
 {
@@ -70,8 +70,8 @@ public class TeleOp1 extends OpMode
     private DcMotor shootA = null;
     private DcMotor shootB = null;
 
-    //private Servo bacon = null;
-    private double midPos = 0;
+    private Servo bacon = null;
+    private double midPos = 0.5;    //because it's a CR Servo this value should be the "0 power" position
 
     //ColorSensor sensorRGB;
     //DeviceInterfaceModule cdim;
@@ -98,7 +98,7 @@ public class TeleOp1 extends OpMode
         shootA = hardwareMap.dcMotor.get("A");
         shootB = hardwareMap.dcMotor.get("B");
 
-        //bacon = hardwareMap.servo.get("bcn");
+        bacon = hardwareMap.servo.get("bcn");
         midPos = 0.5; //bacon.getPosition();
 
         //cdim = hardwareMap.deviceInterfaceModule.get("dim");
@@ -189,6 +189,14 @@ public class TeleOp1 extends OpMode
         else{
             shootA.setPower(0);
             shootB.setPower(0);
+        }
+
+        //straight-up beacon hitter actuator
+        if(gamepad2.right_trigger >= 0.05){
+            bacon.setPosition(Range.scale(gamepad2.right_trigger, 0, 1, midPos, 1));    //push out
+        }
+        if(gamepad2.left_trigger >= 0.05){
+            bacon.setPosition(Range.scale(gamepad2.left_trigger, 0, 1, 0, midPos));    //pull in
         }
 
         //test for the autonomous beacon hitter
