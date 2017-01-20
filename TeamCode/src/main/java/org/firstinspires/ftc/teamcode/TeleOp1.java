@@ -34,6 +34,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
@@ -57,7 +58,7 @@ import static java.lang.Thread.sleep;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp v1.6.0", group="TeleOp")  // @Autonomous(...) is the other common choice
+@TeleOp(name="TeleOp v1.6.1", group="TeleOp")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class TeleOp1 extends OpMode
 {
@@ -70,8 +71,7 @@ public class TeleOp1 extends OpMode
     private DcMotor shootA = null;
     private DcMotor shootB = null;
 
-    private Servo bacon = null;
-    private double midPos = 0.5;    //because it's a CR Servo this value should be the "0 power" position
+    private CRServo bacon = null;
 
     //ColorSensor sensorRGB;
     //DeviceInterfaceModule cdim;
@@ -98,8 +98,7 @@ public class TeleOp1 extends OpMode
         shootA = hardwareMap.dcMotor.get("A");
         shootB = hardwareMap.dcMotor.get("B");
 
-        bacon = hardwareMap.servo.get("bcn");
-        midPos = 0.5; //bacon.getPosition();
+        bacon = hardwareMap.crservo.get("bcn");
 
         //cdim = hardwareMap.deviceInterfaceModule.get("dim");
         //sensorRGB = hardwareMap.colorSensor.get("color");
@@ -193,10 +192,13 @@ public class TeleOp1 extends OpMode
 
         //straight-up beacon hitter actuator
         if(gamepad2.right_trigger >= 0.05){
-            bacon.setPosition(Range.scale(gamepad2.right_trigger, 0, 1, midPos, 1));    //push out
+            bacon.setPower(-gamepad2.right_trigger);    //push out
         }
-        if(gamepad2.left_trigger >= 0.05){
-            bacon.setPosition(Range.scale(gamepad2.left_trigger, 0, 1, 0, midPos));    //pull in
+        else if(gamepad2.left_trigger >= 0.05){
+            bacon.setPower(gamepad2.left_trigger);    //pull in
+        }
+        else{
+            bacon.setPower(0);
         }
 
         //test for the autonomous beacon hitter
