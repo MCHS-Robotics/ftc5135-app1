@@ -54,7 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="TestAuto_BY", group="Autonomous")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class TestAuto_Lin extends LinearOpMode {
 
     /* Declare OpMode members. */

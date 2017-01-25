@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto v6.4.6 B blu", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto v6.5.0 B blu", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous5vB extends LinearOpMode {
 
@@ -66,7 +66,7 @@ public class Autonomous5vB extends LinearOpMode {
     private DcMotor shootA = null;
     private DcMotor shootB = null;
     final double IN_TO_ENC = 360.0 / Math.PI;
-    final double DEG_TO_ENC = 16;  //placeholder
+    final double DEG_TO_ENC = 124.0/9;  //placeholder
     //Telemetry.Item leftEnc, rightEnc;
     ElapsedTime et = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     ColorSensor sensorRGB;
@@ -132,14 +132,14 @@ public class Autonomous5vB extends LinearOpMode {
             backwards(45, 0.7);
             turnLeft(38, 0.5);
             backwards(3, 0.3);
-            checkLine();
+            checkLine(-0.2);
             hitBeacon();
             //backwards(3, 0.3);
             //turnRight(87, 0.5);
             backwards(45, 0.6);
             //turnLeft(87, 0.5);
             //forward(3, 0.3);
-            checkLine();
+            checkLine(-0.2);
             hitBeacon();
             //backwards(3, 0.3);
             complete = true;
@@ -415,7 +415,7 @@ public class Autonomous5vB extends LinearOpMode {
         }
     }
 
-    void checkLine(){
+    void checkLine(double pwrDir){
         left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -423,8 +423,8 @@ public class Autonomous5vB extends LinearOpMode {
         double voltage = linSens.getVoltage();
         double newVolt = voltage;
 
-        left.setPower(0.2);
-        right.setPower(0.2);
+        left.setPower(pwrDir);
+        right.setPower(pwrDir);
 
         //go forward slowly while no significant change in readings
         while(left.isBusy() || right.isBusy()){

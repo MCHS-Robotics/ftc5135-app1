@@ -54,7 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="Touch Sensor", group="Tests")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class TouchTest extends OpMode
 {
     /* Declare OpMode members. */
