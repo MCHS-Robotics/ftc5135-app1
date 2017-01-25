@@ -58,7 +58,7 @@ import static java.lang.Thread.sleep;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp v1.6.1", group="TeleOp")  // @Autonomous(...) is the other common choice
+@TeleOp(name="TeleOp v1.6.2", group="TeleOp")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class TeleOp1 extends OpMode
 {
@@ -73,8 +73,10 @@ public class TeleOp1 extends OpMode
 
     private CRServo bacon = null;
 
-    //ColorSensor sensorRGB;
-    //DeviceInterfaceModule cdim;
+    ColorSensor sensorRGB;
+    DeviceInterfaceModule cdim;
+
+    ElapsedTime et = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     private final boolean TEAM = true;  //true=red team, false = blue team
 
@@ -99,6 +101,7 @@ public class TeleOp1 extends OpMode
         shootB = hardwareMap.dcMotor.get("B");
 
         bacon = hardwareMap.crservo.get("bcn");
+        bacon.setPower(0);
 
         //cdim = hardwareMap.deviceInterfaceModule.get("dim");
         //sensorRGB = hardwareMap.colorSensor.get("color");
@@ -203,20 +206,8 @@ public class TeleOp1 extends OpMode
 
         //test for the autonomous beacon hitter
         /*if(gamepad2.right_bumper)
-            hitBeacon();*/
-
-        //beacon manipulator--R/L triggers
-        /*if(gamepad2.right_trigger > 0){
-            bacon.setPosition(Range.scale(gamepad2.right_trigger, 0, 1, midPos, 1));
-        }
-        else if(gamepad2.left_trigger > 0){
-            bacon.setPosition(Range.scale(gamepad2.left_trigger, 0, 1, midPos, 0));
-        }
-        else{
-            bacon.setPosition(midPos);
-        }*/
-
-
+            hitBeacon();
+        */
     }
 
     /*
@@ -235,39 +226,71 @@ public class TeleOp1 extends OpMode
      *
      * @return red - blue the difference between the aforementioned values as scanned by the sensor
      */
-    /*int scanBeacon(){
+    int scanBeacon(){
         int red = sensorRGB.red();
         int blue = sensorRGB.blue();
 
         return red - blue;
-    }*/
+    }
 
     /**
      * Operates the beacon-hitting arm
      */
-   /* void hitBeacon(){ //throws InterruptedException{
-        bacon.setPosition(midPos);
+    /*void hitBeacon() throws InterruptedException{
+        bacon.setPower(0);
         int bcnCol = scanBeacon();
         //TODO: make one version of this for team Red and one for team Blue-servo will react differently in either case
         //also depends on sensor placement
         if(bcnCol > 0){
             //facing red beacon
-            if(TEAM) {  //if red team
-                bacon.setPosition(0.9);//check this position; swing right
+            if(TEAM) {    //if red team
+                //bacon.setPosition(0.7);//check this position; swing right
+                //timedBeacon(2000);
+                bacon.setPower(0.5);
+                Thread.sleep(3000);
+                bacon.setPower(-0.5);
+                wait(2500);
+                bacon.setPower(0);
             }
-            else {    //if blue team
-                bacon.setPosition(0.1);//swing left
+            else{    //if blue team
+                //forward(6, 0.2);
+                //timedBeaconBack(2000);
             }
-            //wait(1000);
         }
         else{
             //facing blue beacon
-            if(TEAM)    //if red team:
-                bacon.setPosition(0.1);//check this position
-            else    //if blue team:
-                bacon.setPosition(0.9);
-            //wait(1000);
+            if(TEAM) {    //if red team:
+                //forward(6, 0.2);
+                //timedBeacon(2000);
+            }
+            else {    //if blue team:
+                //timedBeaconBack(2000);
+            }
         }
     }*/
+
+    void timedBeacon(double ms) throws InterruptedException{
+        et.reset();
+        double startTime = et.time();
+        double endTime = startTime + ms;
+        while(et.time() < endTime){
+            bacon.setPower(-0.4);
+            //idle();
+        }
+        left.setPower(0);
+        right.setPower(0);
+    }
+
+    void timedBeaconBack(double ms) throws InterruptedException{
+        et.reset();
+        double startTime = et.time();
+        double endTime = startTime + ms;
+        while(et.time() < endTime){
+            bacon.setPower(0.4);
+            //idle();
+        }
+        left.setPower(0);
+        right.setPower(0);
+    }
 
 }

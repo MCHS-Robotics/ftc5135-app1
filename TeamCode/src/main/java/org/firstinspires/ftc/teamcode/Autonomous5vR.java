@@ -34,6 +34,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
@@ -56,9 +57,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto v6.4.4 B", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto v6.4.6 B red", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class Autonomous5 extends LinearOpMode {
+public class Autonomous5vR extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -70,10 +71,9 @@ public class Autonomous5 extends LinearOpMode {
     final double DEG_TO_ENC = 16;  //placeholder
     //Telemetry.Item leftEnc, rightEnc;
     ElapsedTime et = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    //ColorSensor sensorRGB;
-    //DeviceInterfaceModule cdim;
-    private Servo bacon = null;
-    private double midPos = 0.5;    //because it's a CR Servo this value should be the "0 power" position
+    ColorSensor sensorRGB;
+    DeviceInterfaceModule cdim;
+    private CRServo bacon = null;
     private final boolean TEAM = true;  //true=red team, false = blue team
 
     @Override
@@ -102,11 +102,11 @@ public class Autonomous5 extends LinearOpMode {
         /*rightEnc =*/ telemetry.addData("right encoder:", 0);
         telemetry.update();
 
-        //cdim = hardwareMap.deviceInterfaceModule.get("dim");
-        //sensorRGB = hardwareMap.colorSensor.get("color");
+        cdim = hardwareMap.deviceInterfaceModule.get("dim");
+        sensorRGB = hardwareMap.colorSensor.get("color");
 
-        bacon = hardwareMap.servo.get("bcn");
-        bacon.setPosition(midPos);
+        bacon = hardwareMap.crservo.get("bcn");
+        bacon.setPower(0);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -115,7 +115,7 @@ public class Autonomous5 extends LinearOpMode {
         double sTime = runtime.time();
 
         // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
+        if (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
@@ -125,20 +125,20 @@ public class Autonomous5 extends LinearOpMode {
                 turnRight(90, 0.5);
             }*/
 
-            //main auto
-            /*forward(2, 0.3);
-            turnLeft(43, 0.5);
-            forward(55, 0.7);
-            turnLeft(43, 0.5);
+            //red team, closer to corner vortex - beacons only
+            forward(2, 0.3);
+            turnLeft(40, 0.5);
+            forward(50, 0.7);
+            turnRight(43, 0.5);
             forward(3, 0.3);
-            //beacon
-            backward(3, 0.3);
-            turnRight(87, 0.5);
+            hitBeacon();
+            //backwards(3, 0.3);
+            //turnRight(87, 0.5);
             forward(45, 0.6);
-            turnLeft(87, 0.5);
-            forward(3, 0.3);
-            //beacon
-            backward(3, 0.3);*/
+            //turnLeft(87, 0.5);
+            //forward(3, 0.3);
+            hitBeacon();
+            //backwards(3, 0.3);
 
             //cap ball, park mid in a diagonal
             //forward(24, 0.3);
@@ -155,7 +155,7 @@ public class Autonomous5 extends LinearOpMode {
             forward(7, 0.55);*/
 
             //go forward based on time
-            left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            /*left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             //sleep(10000);
             //either this or just a simple "sleep"
@@ -165,7 +165,7 @@ public class Autonomous5 extends LinearOpMode {
                 right.setPower(0);
             }
             if(runtime.time() < sTime + 13)
-                timedForward(3000);
+                timedForward(3000);*/
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
@@ -243,6 +243,28 @@ public class Autonomous5 extends LinearOpMode {
         right.setPower(0);
     }
 
+    void timedBeacon(double ms) throws InterruptedException{
+        et.reset();
+        double startTime = et.time();
+        double endTime = startTime + ms;
+        while(et.time() < endTime){
+            bacon.setPower(-0.4);
+            //idle();
+        }
+        bacon.setPower(0);
+    }
+
+    void timedBeaconBack(double ms) throws InterruptedException{
+        et.reset();
+        double startTime = et.time();
+        double endTime = startTime + ms;
+        while(et.time() < endTime){
+            bacon.setPower(0.4);
+            //idle();
+        }
+        bacon.setPower(0);
+    }
+
     /**
      * Precondition: all values >= 0
      *
@@ -276,7 +298,7 @@ public class Autonomous5 extends LinearOpMode {
      * @param deg amount of degrees to turn
      * @param spd speed of turning, [-1.0, 1.0]
      */
-    void turnLeft(int deg, double spd) throws InterruptedException{
+    void turnRight(int deg, double spd) throws InterruptedException{
         if(opModeIsActive()) {
             setMotorRtP();
 
@@ -301,7 +323,7 @@ public class Autonomous5 extends LinearOpMode {
      * @param deg amount of degrees to turn
      * @param spd speed of turning, [-1.0, 1.0]
      */
-    void turnRight(int deg, double spd) throws InterruptedException{
+    void turnLeft(int deg, double spd) throws InterruptedException{
         if(opModeIsActive()) {
             setMotorRtP();
 
@@ -325,37 +347,47 @@ public class Autonomous5 extends LinearOpMode {
      *
      * @return red - blue the difference between the aforementioned values as scanned by the sensor
      */
-    /*int scanBeacon(){
+    int scanBeacon(){
         int red = sensorRGB.red();
         int blue = sensorRGB.blue();
 
         return red - blue;
-    }*/
+    }
 
     /**
      * Operates the beacon-hitting arm
      */
-   /* void hitBeacon(){
-        bacon.setPosition(midPos);
+    void hitBeacon() throws InterruptedException{
+        bacon.setPower(0);
         int bcnCol = scanBeacon();
         //TODO: make one version of this for team Red and one for team Blue-servo will react differently in either case
         //also depends on sensor placement
         if(bcnCol > 0){
             //facing red beacon
-            if(TEAM)    //if red team
+            if(TEAM) {    //if red team
                 //bacon.setPosition(0.7);//check this position; swing right
-                //TODO: add new method to hit beacon with the sponge arm - run only one side of wheels for a tiny bit
-            else    //if blue team
-                bacon.setPosition(0.3);//swing left
+                timedBeacon(1000);
+                timedBeaconBack(900);
+            }
+            else{    //if blue team
+                forward(6, 0.2);
+                timedBeacon(1000);
+                timedBeaconBack(900);
+            }
         }
         else{
             //facing blue beacon
-            if(TEAM)    //if red team:
-                bacon.setPosition(0.3);//check this position
-            else    //if blue team:
-                bacon.setPosition(0.7);
+            if(TEAM) {    //if red team:
+                forward(6, 0.2);
+                timedBeacon(1000);
+                timedBeaconBack(900);
+            }
+            else {    //if blue team:
+                timedBeacon(1000);
+                timedBeaconBack(900);
+            }
         }
-    }*/
+    }
 
     /**
      * Operates the ball shooter
