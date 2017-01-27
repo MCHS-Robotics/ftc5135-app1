@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto v6.5.0 B blu", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto v6.5.1 B blu", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous5vB extends LinearOpMode {
 
@@ -116,7 +116,7 @@ public class Autonomous5vB extends LinearOpMode {
         double sTime = runtime.time();
 
         // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
+        //if (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
@@ -127,7 +127,7 @@ public class Autonomous5vB extends LinearOpMode {
             }*/
 
             //red team, closer to corner vortex - beacons only
-            backwards(2, 0.3);
+           /* backwards(2, 0.3);
             turnRight(38, 0.5);
             backwards(45, 0.7);
             turnLeft(38, 0.5);
@@ -140,9 +140,12 @@ public class Autonomous5vB extends LinearOpMode {
             //turnLeft(87, 0.5);
             //forward(3, 0.3);
             checkLine(-0.2);
-            hitBeacon();
+            hitBeacon();*/
             //backwards(3, 0.3);
-            complete = true;
+
+            checkLine(-0.07);
+
+            //complete = true;
 
             //cap ball, park mid in a diagonal
             //forward(24, 0.3);
@@ -171,10 +174,10 @@ public class Autonomous5vB extends LinearOpMode {
             if(runtime.time() < sTime + 13)
                 timedForward(3000);*/
 
-            if(complete)
-                requestOpModeStop();
+            /*if(complete)
+                requestOpModeStop();*/
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
-        }
+        //}
     }
 
 
@@ -420,21 +423,18 @@ public class Autonomous5vB extends LinearOpMode {
         right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //check initial readings
-        double voltage = linSens.getVoltage();
+        double voltage = linSens.getVoltage();  //should start scan before the line
         double newVolt = voltage;
 
-        left.setPower(pwrDir);
-        right.setPower(pwrDir);
-
         //go forward slowly while no significant change in readings
-        while(left.isBusy() || right.isBusy()){
+        while(!(newVolt < voltage - 0.6)){
             newVolt = linSens.getVoltage();
-            if(newVolt > voltage){  //need to check relation between ground and line
-                left.setPower(0);
-                right.setPower(0);
-                break;
-            }
+            telemetry.addData("Voltage", newVolt);
+            left.setPower(pwrDir);
+            right.setPower(pwrDir);
         }
+        left.setPower(0);
+        right.setPower(0);
     }
 
 }

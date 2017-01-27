@@ -38,11 +38,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 
-import static java.lang.Thread.sleep;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -75,6 +74,7 @@ public class TeleOp1 extends OpMode
 
     ColorSensor sensorRGB;
     DeviceInterfaceModule cdim;
+    AnalogInput linSens;
 
     ElapsedTime et = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -103,8 +103,9 @@ public class TeleOp1 extends OpMode
         bacon = hardwareMap.crservo.get("bcn");
         bacon.setPower(0);
 
-        //cdim = hardwareMap.deviceInterfaceModule.get("dim");
-        //sensorRGB = hardwareMap.colorSensor.get("color");
+        cdim = hardwareMap.deviceInterfaceModule.get("dim");
+        sensorRGB = hardwareMap.colorSensor.get("color");
+        linSens = hardwareMap.analogInput.get("line");
 
         // eg: Set the drive motor directions:
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -137,6 +138,7 @@ public class TeleOp1 extends OpMode
     @Override
     public void loop(){
         telemetry.addData("Status", "Running: " + runtime.toString());
+        telemetry.addData("Line Voltage:", linSens.getVoltage());
 
         //tank drive
         left.setPower(Range.clip(gamepad1.left_stick_y+gamepad1.right_stick_x, -1, 1));
