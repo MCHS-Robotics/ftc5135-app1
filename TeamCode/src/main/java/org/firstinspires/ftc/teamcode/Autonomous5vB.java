@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto v6.5.1 B blu", group="Autonomous")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Auto v6.7.1 B blu", group="Autonomous")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class Autonomous5vB extends LinearOpMode {
 
@@ -73,8 +73,6 @@ public class Autonomous5vB extends LinearOpMode {
     AnalogInput linSens;
     DeviceInterfaceModule cdim;
     private CRServo bacon = null;
-    private final boolean TEAM = false;  //true=red team, false = blue team
-    private boolean complete = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -117,41 +115,32 @@ public class Autonomous5vB extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         //if (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.update();
 
-            //test auto - move in a square
-            /*for(int i = 0; i < 4; i++){
-                forward(42, 0.7);
-                turnRight(90, 0.5);
-            }*/
+        //blue team, closer to corner vortex - beacons only
+        backwards(3, 0.3);
+        turnRight(38, 0.3);
+        backwards(42, 0.7);
+        turnLeft(8, 0.25);
+        backwards(5, 0.2);
+        turnLeft(11, 0.25);
+        backwards(4, 0.2);
+        turnLeft(19, 0.25);
+        forward(2, 0.16);
+        motorSleep(350);
+        checkLine(-0.15);
+        hitBeacon();
+        backwards(30, 0.35);
+        backwards(3, 0.2);
+        checkLine(-0.15);
+        hitBeacon();
 
-            //red team, closer to corner vortex - beacons only
-           /* backwards(2, 0.3);
-            turnRight(38, 0.5);
-            backwards(45, 0.7);
-            turnLeft(38, 0.5);
-            backwards(3, 0.3);
-            checkLine(-0.2);
-            hitBeacon();
-            //backwards(3, 0.3);
-            //turnRight(87, 0.5);
-            backwards(45, 0.6);
-            //turnLeft(87, 0.5);
-            //forward(3, 0.3);
-            checkLine(-0.2);
-            hitBeacon();*/
-            //backwards(3, 0.3);
+        //cap ball, park mid in a diagonal
+        //forward(24, 0.3);
+        //turnRight(30, 0.3);
 
-            checkLine(-0.07);
-
-            //complete = true;
-
-            //cap ball, park mid in a diagonal
-            //forward(24, 0.3);
-            //turnRight(30, 0.3);
-
-            //red close to vortex, partial park on corner
+        //red close to vortex, partial park on corner
             /*forward(14, 0.5);
             turnLeft(43, 0.35);
             forward(18, 0.5);
@@ -161,23 +150,7 @@ public class Autonomous5vB extends LinearOpMode {
             turnLeft(180, 0.3);
             forward(7, 0.55);*/
 
-            //go forward based on time
-            /*left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            //sleep(10000);
-            //either this or just a simple "sleep"
-
-            while(runtime.time() < sTime + 10){
-                left.setPower(0);
-                right.setPower(0);
-            }
-            if(runtime.time() < sTime + 13)
-                timedForward(3000);*/
-
-            /*if(complete)
-                requestOpModeStop();*/
-            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
-        //}
+        idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
     }
 
 
@@ -201,6 +174,24 @@ public class Autonomous5vB extends LinearOpMode {
     }
 
     /**
+     * Actually updates all telemetry
+     * @throws InterruptedException
+     */
+    private void updateEncoders() throws InterruptedException{
+        telemetry.clearAll();
+        while(opModeIsActive() && (left.isBusy() && right.isBusy())) {  //should this be L&&R or L||R?
+            telemetry.addData("Target Positions", "L: %d  R: %d", left.getTargetPosition(), right.getTargetPosition());
+            telemetry.addData("Current Position", "L: %d  R: %d", left.getCurrentPosition(), right.getCurrentPosition());
+            telemetry.addData("Motor Power", "L: %7f  R: %7f", left.getPower(), right.getPower());
+            telemetry.addData("Line Sensor:", linSens.getVoltage());
+            telemetry.addData("Color Sensor", "R: %d  B: %d", sensorRGB.red(), sensorRGB.blue());
+            telemetry.update();
+
+            idle();
+        }
+    }
+
+    /**
      * Precondition: all values >= 0
      *
      * Drive robot forward a given distance at a given speed
@@ -210,6 +201,7 @@ public class Autonomous5vB extends LinearOpMode {
      */
     void forward(int dist, double spd) throws InterruptedException{
         if(opModeIsActive()) {
+            setMotorRtP();
 
             int dL = left.getCurrentPosition() + (int) (dist * IN_TO_ENC);
             int dR = right.getCurrentPosition() + (int) (dist * IN_TO_ENC);
@@ -217,62 +209,12 @@ public class Autonomous5vB extends LinearOpMode {
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
 
-            setMotorRtP();
-
             left.setPower(spd);
             right.setPower(spd);
 
             updateEncoders();
-
-            turnOffRtP();
         }
-    }
-
-    private void updateEncoders() throws InterruptedException{
-        telemetry.clearAll();
-        while(opModeIsActive() && (left.isBusy() && right.isBusy())) {  //should this be L&&R or L||R?
-            telemetry.addData("Target Positions", "L: %d  R: %d", left.getTargetPosition(), right.getTargetPosition());
-            telemetry.addData("Current Position", "L: %d  R: %d", left.getCurrentPosition(), right.getCurrentPosition());
-            telemetry.addData("Motor Power", "L: %7f  R: %7f", left.getPower(), right.getPower());
-            telemetry.update();
-
-            idle();
-        }
-    }
-
-    void timedForward(double ms) throws InterruptedException{
-        et.reset();
-        double startTime = et.time();
-        double endTime = startTime + ms;
-        while(et.time() < endTime){
-            left.setPower(0.4);
-            right.setPower(0.4);
-            //idle();
-        }
-        left.setPower(0);
-        right.setPower(0);
-    }
-
-    void timedBeacon(double ms) throws InterruptedException{
-        et.reset();
-        double startTime = et.time();
-        double endTime = startTime + ms;
-        while(et.time() < endTime){
-            bacon.setPower(-0.4);
-            //idle();
-        }
-        bacon.setPower(0);
-    }
-
-    void timedBeaconBack(double ms) throws InterruptedException{
-        et.reset();
-        double startTime = et.time();
-        double endTime = startTime + ms;
-        while(et.time() < endTime){
-            bacon.setPower(0.4);
-            //idle();
-        }
-        bacon.setPower(0);
+        turnOffRtP();
     }
 
     /**
@@ -292,6 +234,7 @@ public class Autonomous5vB extends LinearOpMode {
 
             left.setTargetPosition(dL);
             right.setTargetPosition(dR);
+
             left.setPower(spd);
             right.setPower(spd);
 
@@ -350,6 +293,34 @@ public class Autonomous5vB extends LinearOpMode {
         turnOffRtP();
     }
 
+    void motorSleep(int ms) throws InterruptedException{
+        left.setPower(0);
+        right.setPower(0);
+        sleep(ms);
+    }
+
+    void timedBeacon(double ms) throws InterruptedException{
+        et.reset();
+        double startTime = et.time();
+        double endTime = startTime + ms;
+        while(et.time() < endTime){
+            bacon.setPower(-0.4);
+            //idle();
+        }
+        bacon.setPower(0);
+    }
+
+    void timedBeaconBack(double ms) throws InterruptedException{
+        et.reset();
+        double startTime = et.time();
+        double endTime = startTime + ms;
+        while(et.time() < endTime){
+            bacon.setPower(0.4);
+            //idle();
+        }
+        bacon.setPower(0);
+    }
+
     /**
      * Checks the color of the half of the beacon that the Adafruit RGB Sensor is facing.
      * Gets the red value and the blue value, and find the difference.
@@ -357,45 +328,29 @@ public class Autonomous5vB extends LinearOpMode {
      *
      * @return red - blue the difference between the aforementioned values as scanned by the sensor
      */
-    int scanBeacon(){
+    int scanBeacon() throws InterruptedException{
         int red = sensorRGB.red();
         int blue = sensorRGB.blue();
-
+        //updateEncoders();
         return red - blue;
     }
 
     /**
-     * Operates the beacon-hitting arm
+     * Operates the beacon-hitting arm for Blue autonomous
+     * NOTE: Color sensor faces the right side of the beacon, but the presser faces the left
      */
     void hitBeacon() throws InterruptedException{
+        //updateEncoders();
         bacon.setPower(0);
         int bcnCol = scanBeacon();
-        //TODO: make one version of this for team Red and one for team Blue-servo will react differently in either case
-        //also depends on sensor placement
-        if(bcnCol > 0){
-            //facing red beacon
-            if(TEAM) {    //if red team
-                //bacon.setPosition(0.7);//check this position; swing right
-                timedBeacon(1000);
-                timedBeaconBack(900);
-            }
-            else{    //if blue team
-                forward(6, 0.2);
-                timedBeacon(1000);
-                timedBeaconBack(900);
-            }
+        if(bcnCol > 0){ //sensor facing red beacon therefore arm facing blue
+            timedBeacon(1200);
+            timedBeaconBack(1200);
         }
-        else{
-            //facing blue beacon
-            if(TEAM) {    //if red team:
-                forward(6, 0.2);
-                timedBeacon(1000);
-                timedBeaconBack(900);
-            }
-            else {    //if blue team:
-                timedBeacon(1000);
-                timedBeaconBack(900);
-            }
+        else{   //sensor facing blue beacon therefore arm facing red
+            backwards(5, 0.15);
+            timedBeacon(1200);
+            timedBeaconBack(1200);
         }
     }
 
@@ -418,7 +373,7 @@ public class Autonomous5vB extends LinearOpMode {
         }
     }
 
-    void checkLine(double pwrDir){
+    void checkLine(double pwrDir) throws InterruptedException{
         left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -429,7 +384,8 @@ public class Autonomous5vB extends LinearOpMode {
         //go forward slowly while no significant change in readings
         while(!(newVolt < voltage - 0.6)){
             newVolt = linSens.getVoltage();
-            telemetry.addData("Voltage", newVolt);
+            //telemetry.addData("Voltage", newVolt);
+            updateEncoders();
             left.setPower(pwrDir);
             right.setPower(pwrDir);
         }
