@@ -117,13 +117,21 @@ public class Auto_Shoot extends LinearOpMode {
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
+        boolean isShooterSpun = false;
+
         while (opModeIsActive()) {
             while(runtime.milliseconds() <= 15000) {
-                shootA.setPower(0.5);
-                shootB.setPower(0.5);
-                wait(1500);
+                if(!isShooterSpun){
+                    shootA.setPower(0.5);
+                    shootB.setPower(0.5);
+                    wait(1500);
+                    isShooterSpun = true;
+                }
                 ballLift.setPower(0.4);
             }
+            shootA.setPower(0);
+            shootB.setPower(0);
+            ballLift.setPower(0);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
