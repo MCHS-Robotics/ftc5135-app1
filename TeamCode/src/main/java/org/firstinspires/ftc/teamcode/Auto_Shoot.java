@@ -32,30 +32,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-/**
- * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
- * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
- * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
- * It includes all the skeletal structure that all linear OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-
-@TeleOp(name="Template: Linear OpMode", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-@Disabled
+@Autonomous(name="AutoShoot 1.1.0", group="Autonomous")  // @Autonomous(...) is the other common choice
+//@Disabled
 public class Auto_Shoot extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -117,17 +103,17 @@ public class Auto_Shoot extends LinearOpMode {
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
-        boolean isShooterSpun = false;
+        runtime.reset();
+        double sTime = runtime.milliseconds();
 
         while (opModeIsActive()) {
-            while(runtime.milliseconds() <= 15000) {
-                if(!isShooterSpun){
-                    shootA.setPower(0.5);
+            while(runtime.milliseconds() <= 10000) {
+                if(runtime.milliseconds() <= sTime + 1500){
+                    shootA.setPower(-0.5);
                     shootB.setPower(0.5);
-                    wait(1500);
-                    isShooterSpun = true;
                 }
-                ballLift.setPower(0.4);
+                else
+                    ballLift.setPower(0.4);
             }
             shootA.setPower(0);
             shootB.setPower(0);
